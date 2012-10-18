@@ -7,7 +7,21 @@
 	background-color: #CCC;
 	border-radius: 2px;
 }
-.slider-handle {
+.slider-wrap.with-value,
+.slider-wrap.with-range {
+	margin: 4px 0 24px;
+}
+.slider-connector-left {
+	position: absolute;
+	width: 0;
+	height: 4px;
+	left: 0;
+	top: 0;
+	background-color: #AAA;
+	border-radius: 2px 0 0 2px;
+}
+.slider-handle-left,
+.slider-handle-right {
 	position: absolute;
 	width: 4px;
 	height: 12px;
@@ -18,7 +32,7 @@
 }
 .slider-value {
 	position: absolute;
-	width: 40px;
+	width: 60px;
 	text-align: center;
 	left: 50%;
 	margin-left: -20px;
@@ -26,15 +40,16 @@
 	font-size: 12px;
 	color: #666;
 }
-.slider-range {
+.slider-range-min,
+.slider-range-max {
 	position: absolute;
 	top: 8px;
 	font-size: 12px;
 	color: #666;
 }
-.slider-range.min {
+.slider-range-min {
 	left: 0;
 }
-.slider-range.max {
+.slider-range-max {
 	right: 0;
 }
