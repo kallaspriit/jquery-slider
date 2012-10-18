@@ -15,6 +15,7 @@ Features
 * Supports displaying range and current value
 * Supports setting step size
 * Works for any range including 0..1
+* Range and value can be updated at any time
 * It's tiny - just 6KB minified
 
 
@@ -24,11 +25,15 @@ Check out [the example](https://github.com/kallaspriit/jquery-slider/blob/master
 
 ```javascript
 <div style="width: 300px">
-	<p><input type="text" name="slider-simple" id="slider-simple"/></p>
-	<p><input type="text" name="slider-options" id="slider-options" value="128" data-min="0" data-max="255" data-step="5"/></p>
+	<p>
+		<input type="text" name="slider-simple" id="slider-simple" data-step="5"/>
+		<span id="value">0</span>
+	</p>
+	<p><input type="text" name="slider-options" id="slider-options" value="128" data-min="0" data-max="255"/></p>
 	<p><input type="text" name="slider-range" id="slider-range" value="64 192" data-min="0" data-max="255"/></p>
+	<p><button name="update-ranges" id="update-ranges">Update ranges</button> <button name="update-values" id="update-values">Update values</button></p>
 </div>
-<div id="value" style="position: absolute; left: 340px; top: 4px;"></div>
+
 <script>
 
 $(document).ready(function() {
@@ -45,7 +50,7 @@ $(document).ready(function() {
 		onStart: function(el) {
 			console.log('started', el);
 		},
-		onProgress: function(value, el) {
+		onChange: function(value, el) {
 			console.log('progress', value, el);
 		},
 		onEnd: function(value, el) {
@@ -57,9 +62,19 @@ $(document).ready(function() {
 		width: '200px',
 		showValue: true,
 		showRange: true,
-		onProgress: function(valueLeft, valueRight, el) {
+		onChange: function(valueLeft, valueRight, el) {
 			console.log('range progress', valueLeft, valueRight, el);
 		}
+	});
+
+	$('#update-ranges').click(function() {
+		$('#slider-options').slider('range', 0, 1, 0.1);
+		$('#slider-range').slider('range', 0, 1024);
+	});
+
+	$('#update-values').click(function() {
+		$('#slider-options').slider('val', 192);
+		$('#slider-range').slider('val', 32, 64);
 	});
 });
 

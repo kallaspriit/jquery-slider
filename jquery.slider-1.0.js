@@ -8,7 +8,7 @@
 			showValue: false,
 			showRange: false,
 			onStart: null,
-			onProgress: null,
+			onChange: null,
 			onEnd: null
 		};
 
@@ -101,46 +101,6 @@
 			}
 
 			// add labels
-			var minValue = this.input.data('min') || 0,
-				maxValue = this.input.data('max') || 100,
-				step = this.input.data('step') || 1,
-				range = maxValue - minValue,
-				wrapWidth = parseInt(this.wrap.width());
-
-			if (this.ranged) {
-				var valueLeft = Math.round(this.startValueLeft / step) * step,
-					normalizedValueLeft = (valueLeft - minValue) / range,
-					posLeft = wrapWidth * normalizedValueLeft,
-					valueRight = Math.round(this.startValueRight / step) * step,
-					normalizedValueRight = (valueRight - minValue) / range,
-					posRight = wrapWidth * normalizedValueRight;
-
-				this.handleLeft.css({
-					left: posLeft
-				});
-
-				this.handleRight.css({
-					left: posRight
-				});
-
-				this.connector.css({
-					left: posLeft,
-					width: posRight - posLeft
-				});
-			} else {
-				var value = Math.round(this.startValue / step) * step,
-					normalizedValue = (value - minValue) / range,
-					pos = wrapWidth * normalizedValue;
-
-				this.handleLeft.css({
-					left: pos
-				});
-
-				this.connector.css({
-					width: pos
-				});
-			}
-
 			if (this.options.showValue) {
 				this.valueId = 'slider-value-' + baseId;
 
@@ -154,15 +114,19 @@
 				this.value = $('#' + this.valueId);
 
 				if (!this.ranged) {
-					this.value.html(this.startValue);
+					this.value.html(Math.round(this.startValue * 10) / 10);
 				} else {
 					this.value.html(
-						this.startValueLeft + ' - ' + this.startValueRight
+						(Math.round(this.startValueLeft * 10) / 10) + ' - ' +
+						(Math.round(this.startValueRight * 10) / 10)
 					);
 				}
 			}
 
 			if (this.options.showRange) {
+				var minValue = this.input.data('min') || 0,
+					maxValue = this.input.data('max') || 100
+				
 				this.rangeMinId = 'slider-range-min-' + baseId;
 				this.rangeMaxId = 'slider-range-max-' + baseId;
 
@@ -184,6 +148,9 @@
 				this.rangeMin.html(minValue);
 				this.rangeMax.html(maxValue);
 			}
+			
+			// set default value
+			this.setValue(this.input.val());
 
 			this.input.hide();
 		};
@@ -245,7 +212,7 @@
 				return;
 			}
 
-			var wrapLeft = this.wrap.position().left,
+			var wrapLeft = this.wrap.offset().left,
 				wrapWidth = parseInt(this.wrap.width()),
 				pos = Math.min(Math.max(e.clientX - wrapLeft, 0), wrapWidth);
 
@@ -284,11 +251,11 @@
 				this.input.attr('value', value);
 
 				if (this.options.showValue) {
-					this.value.html(value);
+					this.value.html(Math.round(value * 10) / 10);
 				}
 
-				if (typeof(this.options.onProgress) == 'function') {
-					this.options.onProgress(value, this.input[0]);
+				if (typeof(this.options.onChange) == 'function') {
+					this.options.onChange(value, this.input[0]);
 				}
 			} else {
 				var handle = this.dragging == 1
@@ -319,11 +286,14 @@
 				this.input.attr('value', valueLeft + ' ' + valueRight);
 
 				if (this.options.showValue) {
-					this.value.html(valueLeft + ' - ' + valueRight);
+					this.value.html(
+						(Math.round(valueLeft * 10) / 10) + ' - ' +
+						(Math.round(valueRight * 10) / 10)
+					);
 				}
 
-				if (typeof(this.options.onProgress) == 'function') {
-					this.options.onProgress(valueLeft, valueRight, this.input[0]);
+				if (typeof(this.options.onChange) == 'function') {
+					this.options.onChange(valueLeft, valueRight, this.input[0]);
 				}
 			}
 
@@ -347,12 +317,149 @@
 
 			$(document.body).removeClass('slider-unselectable');
 		};
+		
+		this.setValue = function(value) {
+			this.startValue = value;
+			
+			if (typeof(value) == 'string' && value.indexOf(' ') != -1) {
+				var startValues = value.split(' ');
+
+				this.startValueLeft = parseInt(startValues[0]);
+				this.startValueRight = startValues[1];
+
+				this.startValue = this.startValueLeft;
+				this.ranged = true;
+			}
+			
+			var minValue = this.input.data('min') || 0,
+				maxValue = this.input.data('max') || 100,
+				step = this.input.data('step') || 1,
+				range = maxValue - minValue,
+				wrapWidth = parseInt(this.wrap.width());
+
+			if (this.ranged) {
+				if (this.startValueLeft < minValue) {
+					this.startValueLeft = minValue;
+				}
+
+				if (this.startValueRight < minValue) {
+					this.startValueRight = minValue;
+				}
+
+				if (this.startValueLeft > maxValue) {
+					this.startValueLeft = maxValue;
+				}
+
+				if (this.startValueRight > maxValue) {
+					this.startValueRight = maxValue;
+				}
+				
+				var valueLeft = Math.round(this.startValueLeft / step) * step,
+					normalizedValueLeft = (valueLeft - minValue) / range,
+					posLeft = wrapWidth * normalizedValueLeft,
+					valueRight = Math.round(this.startValueRight / step) * step,
+					normalizedValueRight = (valueRight - minValue) / range,
+					posRight = wrapWidth * normalizedValueRight;
+
+				this.handleLeft.css({
+					left: posLeft
+				});
+
+				this.handleRight.css({
+					left: posRight
+				});
+
+				this.connector.css({
+					left: posLeft,
+					width: posRight - posLeft
+				});
+				
+				this.input.attr('value', valueLeft + ' ' + valueRight);
+				
+				if (this.options.showValue) {
+					this.value.html(
+						(Math.round(valueLeft * 10) / 10) + ' - ' +
+						(Math.round(valueRight * 10) / 10)
+					);
+				}
+			} else {
+				if (this.startValue < minValue) {
+					this.startValue = minValue;
+				} else if (this.startValue > maxValue) {
+					this.startValue = maxValue;
+				}
+				
+				var singleValue = Math.round(this.startValue / step) * step,
+					normalizedValue = (singleValue - minValue) / range,
+					pos = wrapWidth * normalizedValue;
+
+				this.handleLeft.css({
+					left: pos
+				});
+
+				this.connector.css({
+					width: pos
+				});
+				
+				this.input.attr('value', value);
+				
+				if (this.options.showValue) {
+					this.value.html(Math.round(singleValue * 10) / 10);
+				}
+			}
+		};
 	};
 
 	Slider.prototype = {
 		init: function() {
 			this.setupDom();
 			this.setupEvents();
+		},
+		
+		range: function(min, max, step) {
+			this.input.data('min', min);
+			this.input.data('max', max);
+			
+			if (typeof(step) == 'number') {
+				this.input.data('step', step);
+			}
+			
+			if (this.options.showRange) {
+				this.rangeMin.html(min);
+				this.rangeMax.html(max);
+			}
+			
+			this.setValue(this.input.val());
+		},
+		
+		min: function(min) {
+			this.range(min, this.input.data('max'));
+		},
+		
+		max: function(max) {
+			this.range(this.input.data('min'), max);
+		},
+		
+		val: function(value, right) {
+			if (typeof(right) != 'undefined') {
+				value = parseInt(value) + ' ' + parseInt(right);
+			} else if (parseInt(value) == value) {
+				value = parseInt(value);
+			}
+			
+			this.setValue(value);
+		},
+		
+		change: function(callback) {
+			this.options.onChange = callback;
+		},
+		
+		start: function(callback) {
+			this.options.onStart = callback;
+		},
+		
+		end: function(callback) {
+			this.options.onEnd = callback;
 		}
 	};
 

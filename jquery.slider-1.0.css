@@ -23,12 +23,16 @@
 .slider-handle-left,
 .slider-handle-right {
 	position: absolute;
-	width: 4px;
+	width: 6px;
 	height: 12px;
 	left: 0;
 	top: -4px;
-	margin-left: -2px;
+	margin-left: -4px;
 	background-color: #666;
+	border-left: 1px solid #CCC;
+	border-right: 1px solid #CCC;
+	border-radius: 2px;
+	box-shadow: 0 0 10px #666;
 }
 .slider-value {
 	position: absolute;
