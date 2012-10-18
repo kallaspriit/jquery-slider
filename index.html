@@ -1,10 +1,38 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title></title>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>jQuery slider</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+		<script src="jquery-1.8.2.min.js"></script>
+		<script src="jquery.slider-1.0.js"></script>
+		<link rel="stylesheet" href="jquery.slider-1.0.css" type="text/css">
 	</head>
 	<body>
 		<input type="text" class="slider" name="slider1" id="slider1" value="50" data-min="0" data-max="100" data-step="1"/>
+		<div id="value"></div>
+		<script>
+
+		$(document).ready(function() {
+			$('.slider').slider({
+				width: '200px',
+				showValue: true,
+				showRange: true,
+				onStart: function(el) {
+					console.log('started', el);
+				},
+				onProgress: function(value, normalizedValue, el) {
+					console.log('progress', value, normalizedValue, el);
+				},
+				onEnd: function(value, el) {
+					console.log('end', value, el);
+				}
+			});
+
+			/*$('#slider1').change(function() {
+				$('#value').html($(this).val());
+			});*/
+		});
+
+		</script>
 	</body>
 </html>
