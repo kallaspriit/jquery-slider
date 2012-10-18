@@ -20,7 +20,7 @@ Features
 
 How to use
 ----------
-See ![the example page](https://github.com/kallaspriit/jquery-slider/blob/master/index.html).
+Check out [the example](https://github.com/kallaspriit/jquery-slider/blob/master/index.html).
 
 ```javascript
 <div style="width: 300px">
