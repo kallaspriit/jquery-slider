@@ -1,7 +1,7 @@
 jQuery Slider Plugin
 ====================
 
-**Minimal, unobtrusive and simple to use horizontal jQuery plugin to turn text inputs into sliders.**
+**Minimal, unobtrusive and simple to use horizontal jQuery slider plugin.**
 
 Features
 --------
