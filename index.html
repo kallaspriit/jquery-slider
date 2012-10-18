@@ -1,19 +1,26 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>jQuery slider</title>
+		<title>jQuery Slider Plugin</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 		<script src="jquery-1.8.2.min.js"></script>
 		<script src="jquery.slider-1.0.js"></script>
 		<link rel="stylesheet" href="jquery.slider-1.0.css" type="text/css">
 	</head>
 	<body>
+		<h1>jQuery Slider Plugin</h1>
 		<div style="width: 300px">
-			<p><input type="text" name="slider-simple" id="slider-simple"/></p>
+			<p>
+				<input type="text" name="slider-simple" id="slider-simple"/>
+				<span id="value">0</span>
+			</p>
 			<p><input type="text" name="slider-options" id="slider-options" value="128" data-min="0" data-max="255" data-step="5"/></p>
-			<p><input type="text" name="slider-dual" id="slider-dual" value="64 192" data-min="0" data-max="255"/></p>
+			<p><input type="text" name="slider-range" id="slider-range" value="64 192" data-min="0" data-max="255"/></p>
 		</div>
-		<div id="value" style="position: absolute; left: 340px; top: 4px;"></div>
+		<footer>
+			<p><a href="https://github.com/kallaspriit/jquery-slider">https://github.com/kallaspriit/jquery-slider</a></p>
+		</footer>
+
 		<script>
 
 		$(document).ready(function() {
@@ -38,12 +45,12 @@
 				}
 			});
 
-			$('#slider-dual').slider({
+			$('#slider-range').slider({
 				width: '200px',
 				showValue: true,
 				showRange: true,
 				onProgress: function(valueLeft, valueRight, el) {
-					console.log('dual progress', valueLeft, valueRight, el);
+					console.log('range progress', valueLeft, valueRight, el);
 				}
 			});
 		});

@@ -192,11 +192,13 @@
 			var self = this;
 
 			this.handleLeft.mousedown(function(e) {
+				self.onDragStart(e);
 				self.onDragStartLeft(e);
 			});
 
 			if (this.ranged) {
 				this.handleRight.mousedown(function(e) {
+					self.onDragStart(e);
 					self.onDragStartRight(e);
 				});
 			}
@@ -208,6 +210,10 @@
 			$(document).mouseup(function(e) {
 				self.onDragEnd(e);
 			});
+		};
+
+		this.onDragStart = function(e) {
+			$(document.body).addClass('slider-unselectable');
 		};
 
 		this.onDragStartLeft = function(e) {
@@ -275,7 +281,7 @@
 					width: pos
 				});
 
-				this.input.val(value);
+				this.input.attr('value', value);
 
 				if (this.options.showValue) {
 					this.value.html(value);
@@ -310,7 +316,7 @@
 					valueRight = value;
 				}
 
-				this.input.val(valueLeft + ' ' + valueRight);
+				this.input.attr('value', valueLeft + ' ' + valueRight);
 
 				if (this.options.showValue) {
 					this.value.html(valueLeft + ' - ' + valueRight);
@@ -325,17 +331,21 @@
 		};
 
 		this.onDragEnd = function(e) {
-			if (this.dragging != 0) {
-				if (typeof(this.options.onEnd) == 'function') {
-					this.options.onEnd(
-						this.input.val(),
-						this.dragging == 1 ? 'left' : 'right',
-						this.input[0]
-					);
-				}
-
-				this.dragging = 0;
+			if (this.dragging == 0) {
+				return;
 			}
+
+			if (typeof(this.options.onEnd) == 'function') {
+				this.options.onEnd(
+					this.input.val(),
+					this.dragging == 1 ? 'left' : 'right',
+					this.input[0]
+				);
+			}
+
+			this.dragging = 0;
+
+			$(document.body).removeClass('slider-unselectable');
 		};
 	};
 
