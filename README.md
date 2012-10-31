@@ -16,6 +16,7 @@ Features
 * Supports setting step size
 * Works for any range including 0..1
 * Range and value can be updated at any time
+* Change events can be limited to minimal interval
 * It's tiny - just 6KB minified
 
 
@@ -43,10 +44,15 @@ $(document).ready(function() {
 		$('#value').html($(this).val());
 	});
 
+	$('#slider-simple').slider('end', function(value) {
+		console.log('simple stop drag value', value);
+	})
+
 	$('#slider-options').slider({
 		width: '200px',
 		showValue: true,
 		showRange: true,
+		minChangeInterval: 500, //fires change event at most every 500ms
 		onStart: function(el) {
 			console.log('started', el);
 		},
@@ -69,7 +75,7 @@ $(document).ready(function() {
 
 	$('#update-ranges').click(function() {
 		$('#slider-options').slider('range', 0, 1, 0.1);
-		$('#slider-range').slider('range', 0, 1024);
+		$('#slider-range').slider('max', 1024);
 	});
 
 	$('#update-values').click(function() {
@@ -80,3 +86,14 @@ $(document).ready(function() {
 
 </script>
 ```
+
+Options
+-------
+* **classPrefix** - name to prepend to every slider class, defaults to none
+* **width** - width of the slider, defaults to 100%
+* **showValue** - should current slider value be displayed, defaults to false
+* **showRange** - should min and max labels be displayed, defaults to false
+* **onStart** - callback to call when starting to change value
+* **onChange** - called every time value changes at most every minChangeInterval
+* **onEnd** - called when a value is selected
+* **minChangeInterval** - at most how often to call the onChange callback
