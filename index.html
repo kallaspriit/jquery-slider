@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>jQuery Slider by kallaspriit</title>
-
+    <title>jQuery Slider by Priit Kallas</title>
+	<link rel="stylesheet" href="jquery.slider-1.0.css" type="text/css">
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
@@ -17,10 +17,7 @@
       <header>
         <h1>jQuery Slider</h1>
         <p>Minimal, unobtrusive and simple to use horizontal jQuery slider plugin.</p>
-
         <p class="view"><a href="https://github.com/kallaspriit/jquery-slider">View the Project on GitHub <small>kallaspriit/jquery-slider</small></a></p>
-
-
         <ul>
           <li><a href="https://github.com/kallaspriit/jquery-slider/zipball/master">Download <strong>ZIP File</strong></a></li>
           <li><a href="https://github.com/kallaspriit/jquery-slider/tarball/master">Download <strong>TAR Ball</strong></a></li>
@@ -28,32 +25,102 @@
         </ul>
       </header>
       <section>
-        <h3>Welcome to GitHub Pages.</h3>
+        <h3>jQuery Slider Plugin</h3>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+		<p><strong>Minimal, unobtrusive and simple to use horizontal jQuery slider plugin.</strong></p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
+		<h4>Live Example</h4>
+		<div style="width: 300px">
+			<p>
+				<input type="text" name="slider-simple" id="slider-simple" data-step="5"/>
+				<span id="value">0</span>
+			</p>
+			<p><input type="text" name="slider-options" id="slider-options" value="128" data-min="0" data-max="255"/></p>
+			<p><input type="text" name="slider-range" id="slider-range" value="64 192" data-min="0" data-max="255"/></p>
+			<p><button name="update-ranges" id="update-ranges">Update ranges</button> <button name="update-values" id="update-values">Update values</button></p>
+		</div>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+		<h4>Features</h4>
+		<ul>
+		<li>Very easy to use</li>
+		<li>Transforms text-inputs so works without JavaScript</li>
+		<li>Normal 'change' event of input element works</li>
+		<li>You can always read the value from the original input that is kept updated</li>
+		<li>Supports single and ranged slider types</li>
+		<li>Simple to change appearance using CSS</li>
+		<li>Provided example minimalistic stylesheet</li>
+		<li>Supports displaying range and current value</li>
+		<li>Supports setting step size</li>
+		<li>Works for any range including 0..1</li>
+		<li>It's tiny - just 8KB minified</li>
+		</ul>
 
-<h3>Designer Templates</h3>
+		<h4>How to use</h4>
+<pre>
+&lt;div style="width: 300px"&gt;
+	&lt;p&gt;
+		&lt;input type="text" name="slider-simple" id="slider-simple" data-step="5"/&gt;
+		&lt;span id="value"&gt;0&lt;/span&gt;
+	&lt;/p&gt;
+	&lt;p&gt;&lt;input type="text" name="slider-options" id="slider-options" value="128" data-min="0" data-max="255"/&gt;&lt;/p&gt;
+	&lt;p&gt;&lt;input type="text" name="slider-range" id="slider-range" value="64 192" data-min="0" data-max="255"/&gt;&lt;/p&gt;
+	&lt;p&gt;&lt;button name="update-ranges" id="update-ranges"&gt;Update ranges&lt;/button&gt; &lt;button name="update-values" id="update-values"&gt;Update values&lt;/button&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;footer&gt;
+	&lt;p&gt;&lt;a href="https://github.com/kallaspriit/jquery-slider"&gt;https://github.com/kallaspriit/jquery-slider&lt;/a&gt;&lt;/p&gt;
+&lt;/footer&gt;
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+&lt;script&gt;
 
-<h3>Rather Drive Stick?</h3>
+$(document).ready(function() {
+	$('#slider-simple').slider();
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+	$('#slider-simple').change(function() {
+		$('#value').html($(this).val());
+	});
 
-<h3>Authors and Contributors</h3>
+	$('#slider-simple').slider('end', function(value) {
+		console.log('simple stop drag value', value);
+	})
 
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
+	$('#slider-options').slider({
+		width: '200px',
+		showValue: true,
+		showRange: true,
+		minChangeInterval: 500, //fires change event at most every 500ms
+		onStart: function(el) {
+			console.log('started', el);
+		},
+		onChange: function(value, el) {
+			console.log('progress', value, el);
+		},
+		onEnd: function(value, el) {
+			console.log('end', value, el);
+		}
+	});
 
-<h3>Support or Contact</h3>
+	$('#slider-range').slider({
+		width: '200px',
+		showValue: true,
+		showRange: true,
+		onChange: function(valueLeft, valueRight, el) {
+			console.log('range progress', valueLeft, valueRight, el);
+		}
+	});
 
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
+	$('#update-ranges').click(function() {
+		$('#slider-options').slider('range', 0, 1, 0.1);
+		$('#slider-range').slider('max', 1024);
+	});
+
+	$('#update-values').click(function() {
+		$('#slider-options').slider('val', 192);
+		$('#slider-range').slider('val', 32, 64);
+	});
+});
+
+&lt;/script&gt;
+</pre>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/kallaspriit">kallaspriit</a></p>
@@ -61,6 +128,57 @@ $ git checkout gh-pages
       </footer>
     </div>
     <script src="javascripts/scale.fix.js"></script>
-    
+	<script src="jquery-1.8.2.min.js"></script>
+	<script src="jquery.slider-1.0.js"></script>
+	<script>
+
+	$(document).ready(function() {
+		$('#slider-simple').slider();
+
+		$('#slider-simple').change(function() {
+			$('#value').html($(this).val());
+		});
+
+		$('#slider-simple').slider('end', function(value) {
+			console.log('simple stop drag value', value);
+		})
+
+		$('#slider-options').slider({
+			width: '200px',
+			showValue: true,
+			showRange: true,
+			minChangeInterval: 500, //fires change event at most every 500ms
+			onStart: function(el) {
+				console.log('started', el);
+			},
+			onChange: function(value, el) {
+				console.log('progress', value, el);
+			},
+			onEnd: function(value, el) {
+				console.log('end', value, el);
+			}
+		});
+
+		$('#slider-range').slider({
+			width: '200px',
+			showValue: true,
+			showRange: true,
+			onChange: function(valueLeft, valueRight, el) {
+				console.log('range progress', valueLeft, valueRight, el);
+			}
+		});
+
+		$('#update-ranges').click(function() {
+			$('#slider-options').slider('range', 0, 1, 0.1);
+			$('#slider-range').slider('max', 1024);
+		});
+
+		$('#update-values').click(function() {
+			$('#slider-options').slider('val', 192);
+			$('#slider-range').slider('val', 32, 64);
+		});
+	});
+
+	</script>
   </body>
 </html>
