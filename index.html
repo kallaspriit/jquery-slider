@@ -58,65 +58,65 @@
 		<h4>How to use</h4>
 <pre>
 &lt;div style="width: 300px"&gt;
-	&lt;p&gt;
-		&lt;input type="text" name="slider-simple" id="slider-simple" data-step="5"/&gt;
-		&lt;span id="value"&gt;0&lt;/span&gt;
-	&lt;/p&gt;
-	&lt;p&gt;&lt;input type="text" name="slider-options" id="slider-options" value="128" data-min="0" data-max="255"/&gt;&lt;/p&gt;
-	&lt;p&gt;&lt;input type="text" name="slider-range" id="slider-range" value="64 192" data-min="0" data-max="255"/&gt;&lt;/p&gt;
-	&lt;p&gt;&lt;button name="update-ranges" id="update-ranges"&gt;Update ranges&lt;/button&gt; &lt;button name="update-values" id="update-values"&gt;Update values&lt;/button&gt;&lt;/p&gt;
+    &lt;p&gt;
+        &lt;input type="text" name="slider-simple" id="slider-simple" data-step="5"/&gt;
+        &lt;span id="value"&gt;0&lt;/span&gt;
+    &lt;/p&gt;
+    &lt;p&gt;&lt;input type="text" name="slider-options" id="slider-options" value="128" data-min="0" data-max="255"/&gt;&lt;/p&gt;
+    &lt;p&gt;&lt;input type="text" name="slider-range" id="slider-range" value="64 192" data-min="0" data-max="255"/&gt;&lt;/p&gt;
+    &lt;p&gt;&lt;button name="update-ranges" id="update-ranges"&gt;Update ranges&lt;/button&gt; &lt;button name="update-values" id="update-values"&gt;Update values&lt;/button&gt;&lt;/p&gt;
 &lt;/div&gt;
 &lt;footer&gt;
-	&lt;p&gt;&lt;a href="https://github.com/kallaspriit/jquery-slider"&gt;https://github.com/kallaspriit/jquery-slider&lt;/a&gt;&lt;/p&gt;
+    &lt;p&gt;&lt;a href="https://github.com/kallaspriit/jquery-slider"&gt;https://github.com/kallaspriit/jquery-slider&lt;/a&gt;&lt;/p&gt;
 &lt;/footer&gt;
 
 &lt;script&gt;
 
 $(document).ready(function() {
-	$('#slider-simple').slider();
+    $('#slider-simple').slider();
 
-	$('#slider-simple').change(function() {
-		$('#value').html($(this).val());
-	});
+    $('#slider-simple').change(function() {
+        $('#value').html($(this).val());
+    });
 
-	$('#slider-simple').slider('end', function(value) {
-		console.log('simple stop drag value', value);
-	})
+    $('#slider-simple').slider('end', function(value) {
+        console.log('simple stop drag value', value);
+    })
 
-	$('#slider-options').slider({
-		width: '200px',
-		showValue: true,
-		showRange: true,
-		minChangeInterval: 500, //fires change event at most every 500ms
-		onStart: function(el) {
-			console.log('started', el);
-		},
-		onChange: function(value, el) {
-			console.log('progress', value, el);
-		},
-		onEnd: function(value, el) {
-			console.log('end', value, el);
-		}
-	});
+    $('#slider-options').slider({
+        width: '200px',
+        showValue: true,
+        showRange: true,
+        minChangeInterval: 500, //fires change event at most every 500ms
+        onStart: function(el) {
+            console.log('started', el);
+        },
+        onChange: function(value, el) {
+            console.log('progress', value, el);
+        },
+        onEnd: function(value, el) {
+            console.log('end', value, el);
+        }
+    });
 
-	$('#slider-range').slider({
-		width: '200px',
-		showValue: true,
-		showRange: true,
-		onChange: function(valueLeft, valueRight, el) {
-			console.log('range progress', valueLeft, valueRight, el);
-		}
-	});
+    $('#slider-range').slider({
+        width: '200px',
+        showValue: true,
+        showRange: true,
+        onChange: function(valueLeft, valueRight, el) {
+            console.log('range progress', valueLeft, valueRight, el);
+        }
+    });
 
-	$('#update-ranges').click(function() {
-		$('#slider-options').slider('range', 0, 1, 0.1);
-		$('#slider-range').slider('max', 1024);
-	});
+    $('#update-ranges').click(function() {
+        $('#slider-options').slider('range', 0, 1, 0.1);
+        $('#slider-range').slider('max', 1024);
+    });
 
-	$('#update-values').click(function() {
-		$('#slider-options').slider('val', 192);
-		$('#slider-range').slider('val', 32, 64);
-	});
+    $('#update-values').click(function() {
+        $('#slider-options').slider('val', 192);
+        $('#slider-range').slider('val', 32, 64);
+    });
 });
 
 &lt;/script&gt;
