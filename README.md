@@ -97,3 +97,19 @@ Options
 * **onChange** - called every time value changes at most every minChangeInterval
 * **onEnd** - called when a value is selected
 * **minChangeInterval** - at most how often to call the onChange callback
+
+Functions
+-------
+* **init** - initializes the slider, called on $(..).slider();
+* **range(min, max, [step])** - changes slider range and optionally step
+* **min(value)** - set range low-value
+* **max(value)** - set range high-value
+* **val(value, [right])** - sets slider value, use two values for range slider
+* **change(callback)** - sets callback to call on value change (sliding)
+* **start(callback)** - sets callback to call when sliding is started
+* **end(callback)** - sets callback to call when sliding is ended
+
+For example
+```javascript
+$('#slider-options').slider('range', 0, 1, 0.1);
+```
