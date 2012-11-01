@@ -1,60 +1,60 @@
 <!doctype html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>jQuery Slider by Priit Kallas</title>
-	<link rel="stylesheet" href="jquery.slider-1.0.css" type="text/css">
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1>jQuery Slider</h1>
-        <p>Minimal, unobtrusive and simple to use horizontal jQuery slider plugin.</p>
-        <p class="view"><a href="https://github.com/kallaspriit/jquery-slider">View the Project on GitHub <small>kallaspriit/jquery-slider</small></a></p>
-        <ul>
-          <li><a href="https://github.com/kallaspriit/jquery-slider/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/kallaspriit/jquery-slider/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/kallaspriit/jquery-slider">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h3>Minimal, unobtrusive and simple to use horizontal jQuery slider plugin.</h3>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="chrome=1">
+		<title>jQuery Slider by Priit Kallas</title>
+		<link rel="stylesheet" href="jquery.slider-1.0.css" type="text/css">
+		<link rel="stylesheet" href="stylesheets/styles.css">
+		<link rel="stylesheet" href="stylesheets/pygment_trac.css">
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+	</head>
+	<body>
+		<div class="wrapper">
+			<header>
+				<h1>jQuery Slider</h1>
+				<p>Minimal, unobtrusive and simple to use horizontal jQuery slider plugin.</p>
+				<p class="view"><a href="https://github.com/kallaspriit/jquery-slider">View the Project on GitHub <small>kallaspriit/jquery-slider</small></a></p>
+				<ul>
+					<li><a href="https://github.com/kallaspriit/jquery-slider/zipball/master">Download <strong>ZIP File</strong></a></li>
+					<li><a href="https://github.com/kallaspriit/jquery-slider/tarball/master">Download <strong>TAR Ball</strong></a></li>
+					<li><a href="https://github.com/kallaspriit/jquery-slider">View On <strong>GitHub</strong></a></li>
+				</ul>
+			</header>
+			<section>
+				<h3>Minimal, unobtrusive and simple to use horizontal jQuery slider plugin.</h3>
 
-		<h4>Live Example</h4>
-		<div style="width: 300px">
-			<p>
-				<input type="text" name="slider-simple" id="slider-simple" data-step="5"/>
-				<span id="value">0</span>
-			</p>
-			<p><input type="text" name="slider-options" id="slider-options" value="128" data-min="0" data-max="255"/></p>
-			<p><input type="text" name="slider-range" id="slider-range" value="64 192" data-min="0" data-max="255"/></p>
-			<p><button name="update-ranges" id="update-ranges">Update ranges</button> <button name="update-values" id="update-values">Update values</button></p>
-		</div>
+				<h4>Live Example</h4>
+				<div style="width: 300px">
+					<p>
+						<input type="text" name="slider-simple" id="slider-simple" data-step="5"/>
+						<span id="value">0</span>
+					</p>
+					<p><input type="text" name="slider-options" id="slider-options" value="128" data-min="0" data-max="255"/></p>
+					<p><input type="text" name="slider-range" id="slider-range" value="64 192" data-min="0" data-max="255"/></p>
+					<p><button name="update-ranges" id="update-ranges">Update ranges</button> <button name="update-values" id="update-values">Update values</button></p>
+				</div>
 
-		<h4>Features</h4>
-		<ul>
-		<li>Very easy to use</li>
-		<li>Transforms text-inputs so works without JavaScript</li>
-		<li>Normal 'change' event of input element works</li>
-		<li>You can always read the value from the original input that is kept updated</li>
-		<li>Supports single and ranged slider types</li>
-		<li>Simple to change appearance using CSS</li>
-		<li>Provided example minimalistic stylesheet</li>
-		<li>Supports displaying range and current value</li>
-		<li>Supports setting step size</li>
-		<li>Works for any range including 0..1</li>
-		<li>It's tiny - just 8KB minified</li>
-		</ul>
+				<h4>Features</h4>
+				<ul>
+					<li>Very easy to use</li>
+					<li>Transforms text-inputs so works without JavaScript</li>
+					<li>Normal 'change' event of input element works</li>
+					<li>You can always read the value from the original input that is kept updated</li>
+					<li>Supports single and ranged slider types</li>
+					<li>Simple to change appearance using CSS</li>
+					<li>Provided example minimalistic stylesheet</li>
+					<li>Supports displaying range and current value</li>
+					<li>Supports setting step size</li>
+					<li>Works for any range including 0..1</li>
+					<li>It's tiny - just 8KB minified</li>
+				</ul>
 
-		<h4>How to use</h4>
-<pre>
+				<h4>How to use</h4>
+				<pre>
 &lt;div style="width: 300px"&gt;
     &lt;p&gt;
         &lt;input type="text" name="slider-simple" id="slider-simple" data-step="5"/&gt;
@@ -118,65 +118,91 @@ $(document).ready(function() {
 });
 
 &lt;/script&gt;
-</pre>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/kallaspriit">kallaspriit</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-	<script src="jquery-1.8.2.min.js"></script>
-	<script src="jquery.slider-1.0.js"></script>
-	<script>
+			</pre>
 
-	$(document).ready(function() {
-		$('#slider-simple').slider();
+			<h4>Supported options</h4>
+			<ul>
+				<li><strong>classPrefix</strong> - name to prepend to every slider class, defaults to none</li>
+				<li><strong>width</strong> - width of the slider, defaults to 100%</li>
+				<li><strong>showValue</strong> - should current slider value be displayed, defaults to false</li>
+				<li><strong>showRange</strong> - should min and max labels be displayed, defaults to false</li>
+				<li><strong>onStart</strong> - callback to call when starting to change value</li>
+				<li><strong>onChange</strong> - called every time value changes at most every minChangeInterval
+				<li><strong>onEnd</strong> - called when a value is selected</li>
+				<li><strong>minChangeInterval</strong> - at most how often to call the onChange callback</li>
+			</ul>
 
-		$('#slider-simple').change(function() {
-			$('#value').html($(this).val());
-		});
+			<h4>Functions</h4>
+			<ul>
+				<li><strong>init</strong> - initializes the slider, called on $(..).slider();</li>
+				<li><strong>range(min, max, [step])</strong> - changes slider range and optionally step</li>
+				<li><strong>min(value)</strong> - set range low-value</li>
+				<li><strong>max(value)</strong> - set range high-value</li>
+				<li><strong>val(value, [right])</strong> - sets slider value, use two values for range slider</li>
+				<li><strong>change(callback)</strong> - sets callback to call on value change (sliding)</li>
+				<li><strong>start(callback)</strong> - sets callback to call when sliding is started</li>
+				<li><strong>end(callback)</strong> - sets callback to call when sliding is ended</li>
+			</ul>
+			<p>For example <pre>$('#slider-options').slider('range', 0, 1, 0.1);</pre></p>
 
-		$('#slider-simple').slider('end', function(value) {
-			console.log('simple stop drag value', value);
-		})
+			</section>
+			<footer>
+				<p>This project is maintained by <a href="https://github.com/kallaspriit">kallaspriit</a></p>
+				<p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+			</footer>
+		</div>
+		<script src="javascripts/scale.fix.js"></script>
+		<script src="jquery-1.8.2.min.js"></script>
+		<script src="jquery.slider-1.0.js"></script>
+		<script>
 
-		$('#slider-options').slider({
-			width: '200px',
-			showValue: true,
-			showRange: true,
-			minChangeInterval: 500, //fires change event at most every 500ms
-			onStart: function(el) {
-				console.log('started', el);
-			},
-			onChange: function(value, el) {
-				console.log('progress', value, el);
-			},
-			onEnd: function(value, el) {
-				console.log('end', value, el);
-			}
-		});
+			$(document).ready(function() {
+				$('#slider-simple').slider();
 
-		$('#slider-range').slider({
-			width: '200px',
-			showValue: true,
-			showRange: true,
-			onChange: function(valueLeft, valueRight, el) {
-				console.log('range progress', valueLeft, valueRight, el);
-			}
-		});
+				$('#slider-simple').change(function() {
+					$('#value').html($(this).val());
+				});
 
-		$('#update-ranges').click(function() {
-			$('#slider-options').slider('range', 0, 1, 0.1);
-			$('#slider-range').slider('max', 1024);
-		});
+				$('#slider-simple').slider('end', function(value) {
+					console.log('simple stop drag value', value);
+				})
 
-		$('#update-values').click(function() {
-			$('#slider-options').slider('val', 192);
-			$('#slider-range').slider('val', 32, 64);
-		});
-	});
+				$('#slider-options').slider({
+					width: '200px',
+					showValue: true,
+					showRange: true,
+					minChangeInterval: 500, //fires change event at most every 500ms
+					onStart: function(el) {
+						console.log('started', el);
+					},
+					onChange: function(value, el) {
+						console.log('progress', value, el);
+					},
+					onEnd: function(value, el) {
+						console.log('end', value, el);
+					}
+				});
 
-	</script>
-  </body>
+				$('#slider-range').slider({
+					width: '200px',
+					showValue: true,
+					showRange: true,
+					onChange: function(valueLeft, valueRight, el) {
+						console.log('range progress', valueLeft, valueRight, el);
+					}
+				});
+
+				$('#update-ranges').click(function() {
+					$('#slider-options').slider('range', 0, 1, 0.1);
+					$('#slider-range').slider('max', 1024);
+				});
+
+				$('#update-values').click(function() {
+					$('#slider-options').slider('val', 192);
+					$('#slider-range').slider('val', 32, 64);
+				});
+			});
+
+		</script>
+	</body>
 </html>
