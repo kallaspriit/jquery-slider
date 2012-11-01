@@ -17,7 +17,7 @@ Features
 * Works for any range including 0..1
 * Range and value can be updated at any time
 * Change events can be limited to minimal interval
-* It's tiny - just 6KB minified
+* It's tiny - just 8KB minified
 
 
 How to use
