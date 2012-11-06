@@ -4,8 +4,8 @@
 		<title>jQuery Slider Plugin</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 		<script src="jquery-1.8.2.min.js"></script>
-		<script src="jquery.slider-1.0.js"></script>
-		<link rel="stylesheet" href="jquery.slider-1.0.css" type="text/css">
+		<script src="jquery.slider-1.1.js"></script>
+		<link rel="stylesheet" href="jquery.slider-1.1.css" type="text/css">
 	</head>
 	<body>
 		<h1>jQuery Slider Plugin</h1>
@@ -30,7 +30,7 @@
 			$('#slider-simple').change(function() {
 				$('#value').html($(this).val());
 			});
-			
+
 			$('#slider-simple').slider('end', function(value) {
 				console.log('simple stop drag value', value);
 			})
@@ -59,12 +59,12 @@
 					console.log('range progress', valueLeft, valueRight, el);
 				}
 			});
-			
+
 			$('#update-ranges').click(function() {
 				$('#slider-options').slider('range', 0, 1, 0.1);
 				$('#slider-range').slider('max', 1024);
 			});
-			
+
 			$('#update-values').click(function() {
 				$('#slider-options').slider('val', 192);
 				$('#slider-range').slider('val', 32, 64);
