@@ -446,7 +446,7 @@
 				newValue;
 
 			if (e.shiftKey) {
-				step *= 5;
+				step *= 10;
 			}
 
 			if (e.keyCode == 37) {
