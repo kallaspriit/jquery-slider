@@ -35,6 +35,7 @@
 		this.rangeMin = null;
 		this.rangeMax = null;
 		this.lastChangeTime = null;
+		this.activeHandle = 0;
 
 		this.setupDom = function() {
 			instances++;
@@ -168,11 +169,29 @@
 					self.onDragProgress(e);
 				});
 
-				$(window).one('mouseup', function(e) {
+				$(document).one('mouseup', function(e) {
 					$(document).unbind('mousemove')
 
 					self.onDragEnd(e);
 				});
+
+				$(document).one('mousedown', function() {
+					self.activeHandle = 0;
+				});
+
+				$(document).keydown(function(e) {
+					self.onKeyDown(e);
+				});
+
+				for (var i = 0; i < window._jQsliders.length; i++) {
+					window._jQsliders[i].activeHandle = 0;
+				}
+
+				self.activeHandle = 1;
+
+				e.preventDefault();
+
+				return false;
 			});
 
 			if (this.ranged) {
@@ -184,13 +203,35 @@
 						self.onDragProgress(e);
 					});
 
-					$(window).one('mouseup', function(e) {
+					$(document).one('mouseup', function(e) {
 						$(document).unbind('mousemove')
 
 						self.onDragEnd(e);
 					});
+
+					$(document).one('mousedown', function() {
+						self.activeHandle = 0;
+					});
+
+					$(document).unbind('keydown').keydown(function(e) {
+						self.onKeyDown(e);
+					});
+
+					for (var i = 0; i < window._jQsliders.length; i++) {
+						window._jQsliders[i].activeHandle = 0;
+					}
+
+					self.activeHandle = 2;
+
+					e.preventDefault();
+
+					return false;
 				});
 			}
+
+			this.wrap.click(function(e) {
+				self.jumpTo(e.clientX);
+			});
 		};
 
 		this.onDragStart = function(e) {
@@ -376,6 +417,86 @@
 			this.enableTextSelect();
 		};
 
+		this.onKeyDown = function(e) {
+			if (
+				this.activeHandle == 0
+				|| (e.keyCode != 37 && e.keyCode != 39)
+			) {
+				return;
+			}
+
+			var rawValue = this.input.val(),
+				leftValue,
+				rightValue,
+				changeValue;
+
+			if (this.ranged) {
+				leftValue = parseInt(rawValue.split(' ')[0]);
+				rightValue = parseInt(rawValue.split(' ')[1]);
+
+				if (this.activeHandle == 1) {
+					changeValue = leftValue;
+				} else {
+					changeValue = rightValue;
+				}
+			} else {
+				leftValue = parseInt(rawValue);
+				changeValue = leftValue;
+			}
+
+			var	minValue = parseInt(this.input.data('min')) || 0,
+				maxValue = parseInt(this.input.data('max')) || 100,
+				step = parseInt(this.input.data('step')) || 1,
+				newValue;
+
+			if (e.shiftKey) {
+				step *= 5;
+			}
+
+			if (e.keyCode == 37) {
+				changeValue = Math.max(changeValue - step, minValue);
+			} else {
+				changeValue = Math.min(changeValue + step, maxValue);
+			}
+
+			if (this.ranged) {
+				if (this.activeHandle == 1) {
+					if (changeValue > rightValue) {
+						changeValue = rightValue;
+					}
+
+					this.setValue(changeValue + ' ' + rightValue);
+				} else {
+					if (changeValue < leftValue) {
+						changeValue = leftValue;
+					}
+
+					this.setValue(leftValue + ' ' + changeValue);
+				}
+			} else {
+				this.setValue(changeValue);
+			}
+
+			console.log('key', e.keyCode, this.activeHandle, newValue);
+		};
+
+		this.jumpTo = function(clientX) {
+			if (this.dragging != 0) {
+				return;
+			}
+
+			var wrapLeft = this.wrap.offset().left,
+				wrapWidth = parseInt(this.wrap.width()),
+				pos = Math.min(Math.max(clientX - wrapLeft, 0), wrapWidth),
+				event = {
+					clientX: clientX
+				};
+
+			this.dragging = !this.ranged || pos < wrapWidth / 2 ? 1 : 2;
+			this.onDragProgress(event);
+			this.dragging = 0;
+		};
+
 		this.setValue = function(value) {
 			this.startValue = value;
 
@@ -440,6 +561,14 @@
 						(Math.round(valueRight * 10) / 10)
 					);
 				}
+
+				if (typeof(this.options.onChange) == 'function') {
+					this.options.onChange(
+						valueLeft,
+						valueRight,
+						this.input[0]
+					);
+				}
 			} else {
 				if (this.startValue < minValue) {
 					this.startValue = minValue;
@@ -464,7 +593,16 @@
 				if (this.options.showValue) {
 					this.value.html(Math.round(singleValue * 10) / 10);
 				}
+
+				if (typeof(this.options.onChange) == 'function') {
+					this.options.onChange(
+						singleValue,
+						this.input[0]
+					);
+				}
 			}
+
+			this.input.trigger('change');
 		};
 
 		this.disableTextSelect = function() {
@@ -490,6 +628,12 @@
 
 	Slider.prototype = {
 		init: function() {
+			if (typeof(window._jQsliders) == 'undefined') {
+				window._jQsliders = [];
+			}
+
+			window._jQsliders.push(this);
+
 			this.setupDom();
 			this.setupEvents();
 		},
