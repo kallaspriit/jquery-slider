@@ -128,7 +128,7 @@
 			if (this.options.showRange) {
 				var minValue = this.input.data('min') || 0,
 					maxValue = this.input.data('max') || 100
-				
+
 				this.rangeMinId = 'slider-range-min-' + baseId;
 				this.rangeMaxId = 'slider-range-max-' + baseId;
 
@@ -150,7 +150,7 @@
 				this.rangeMin.html(minValue);
 				this.rangeMax.html(maxValue);
 			}
-			
+
 			// set default value
 			this.setValue(this.input.val());
 
@@ -163,22 +163,34 @@
 			this.handleLeft.mousedown(function(e) {
 				self.onDragStart(e);
 				self.onDragStartLeft(e);
+
+				$(document).unbind('mousemove').mousemove(function(e) {
+					self.onDragProgress(e);
+				});
+
+				$(window).one('mouseup', function(e) {
+					$(document).unbind('mousemove')
+
+					self.onDragEnd(e);
+				});
 			});
 
 			if (this.ranged) {
 				this.handleRight.mousedown(function(e) {
 					self.onDragStart(e);
 					self.onDragStartRight(e);
+
+					$(document).unbind('mousemove').mousemove(function(e) {
+						self.onDragProgress(e);
+					});
+
+					$(window).one('mouseup', function(e) {
+						$(document).unbind('mousemove')
+
+						self.onDragEnd(e);
+					});
 				});
 			}
-
-			$(document).mousemove(function(e) {
-				self.onDragProgress(e);
-			});
-
-			$(document).mouseup(function(e) {
-				self.onDragEnd(e);
-			});
 		};
 
 		this.onDragStart = function(e) {
@@ -264,7 +276,7 @@
 					} else {
 						currentTime = this.getMillitime();
 						sinceLast = currentTime - this.lastChangeTime;
-						
+
 						if (
 							this.options.minChangeInterval == null
 							|| sinceLast >= this.options.minChangeInterval
@@ -316,7 +328,7 @@
 						this.input[0]
 					);
 				}
-				
+
 				if (typeof(this.options.onChange) == 'function') {
 					if (this.options.minChangeInterval == 0) {
 						this.options.onChange(
@@ -327,7 +339,7 @@
 					} else {
 						currentTime = this.getMillitime();
 						sinceLast = currentTime - this.lastChangeTime;
-						
+
 						if (
 							this.options.minChangeInterval == null
 							|| sinceLast >= this.options.minChangeInterval
@@ -363,10 +375,10 @@
 
 			this.enableTextSelect();
 		};
-		
+
 		this.setValue = function(value) {
 			this.startValue = value;
-			
+
 			if (typeof(value) == 'string' && value.indexOf(' ') != -1) {
 				var startValues = value.split(' ');
 
@@ -376,7 +388,7 @@
 				this.startValue = this.startValueLeft;
 				this.ranged = true;
 			}
-			
+
 			var minValue = this.input.data('min') || 0,
 				maxValue = this.input.data('max') || 100,
 				step = this.input.data('step') || 1,
@@ -399,7 +411,7 @@
 				if (this.startValueRight > maxValue) {
 					this.startValueRight = maxValue;
 				}
-				
+
 				var valueLeft = Math.round(this.startValueLeft / step) * step,
 					normalizedValueLeft = (valueLeft - minValue) / range,
 					posLeft = wrapWidth * normalizedValueLeft,
@@ -419,9 +431,9 @@
 					left: posLeft,
 					width: posRight - posLeft
 				});
-				
+
 				this.input.attr('value', valueLeft + ' ' + valueRight);
-				
+
 				if (this.options.showValue) {
 					this.value.html(
 						(Math.round(valueLeft * 10) / 10) + ' - ' +
@@ -434,7 +446,7 @@
 				} else if (this.startValue > maxValue) {
 					this.startValue = maxValue;
 				}
-				
+
 				var singleValue = Math.round(this.startValue / step) * step,
 					normalizedValue = (singleValue - minValue) / range,
 					pos = wrapWidth * normalizedValue;
@@ -446,15 +458,15 @@
 				this.connector.css({
 					width: pos
 				});
-				
+
 				this.input.attr('value', value);
-				
+
 				if (this.options.showValue) {
 					this.value.html(Math.round(singleValue * 10) / 10);
 				}
 			}
 		};
-		
+
 		this.disableTextSelect = function() {
 			$('*')
 				.attr('unselectable', 'on')
@@ -462,7 +474,7 @@
 				.on('selectstart', false)
 				.addClass('slider-unselectable');
 		};
-		
+
 		this.enableTextSelect = function() {
 			$('*')
 				.removeAttr('unselectable')
@@ -470,7 +482,7 @@
 				.unbind('selectstart')
 				.removeClass('slider-unselectable');
 		};
-		
+
 		this.getMillitime = function() {
 			return (new Date()).getTime();
 		};
@@ -481,49 +493,49 @@
 			this.setupDom();
 			this.setupEvents();
 		},
-		
+
 		range: function(min, max, step) {
 			this.input.data('min', min);
 			this.input.data('max', max);
-			
+
 			if (typeof(step) == 'number') {
 				this.input.data('step', step);
 			}
-			
+
 			if (this.options.showRange) {
 				this.rangeMin.html(min);
 				this.rangeMax.html(max);
 			}
-			
+
 			this.setValue(this.input.val());
 		},
-		
+
 		min: function(min) {
 			this.range(min, this.input.data('max'));
 		},
-		
+
 		max: function(max) {
 			this.range(this.input.data('min'), max);
 		},
-		
+
 		val: function(value, right) {
 			if (typeof(right) != 'undefined') {
 				value = parseInt(value) + ' ' + parseInt(right);
 			} else if (parseInt(value) == value) {
 				value = parseInt(value);
 			}
-			
+
 			this.setValue(value);
 		},
-		
+
 		change: function(callback) {
 			this.options.onChange = callback;
 		},
-		
+
 		start: function(callback) {
 			this.options.onStart = callback;
 		},
-		
+
 		end: function(callback) {
 			this.options.onEnd = callback;
 		}
