@@ -179,10 +179,6 @@
 					self.activeHandle = 0;
 				});
 
-				$(document).keydown(function(e) {
-					self.onKeyDown(e);
-				});
-
 				for (var i = 0; i < window._jQsliders.length; i++) {
 					window._jQsliders[i].activeHandle = 0;
 				}
@@ -213,10 +209,6 @@
 						self.activeHandle = 0;
 					});
 
-					$(document).unbind('keydown').keydown(function(e) {
-						self.onKeyDown(e);
-					});
-
 					for (var i = 0; i < window._jQsliders.length; i++) {
 						window._jQsliders[i].activeHandle = 0;
 					}
@@ -228,6 +220,10 @@
 					return false;
 				});
 			}
+
+			$(document).keydown(function(e) {
+				self.onKeyDown(e);
+			});
 
 			this.wrap.click(function(e) {
 				self.jumpTo(e.clientX);
@@ -491,6 +487,10 @@
 				event = {
 					clientX: clientX
 				};
+
+			for (var i = 0; i < window._jQsliders.length; i++) {
+				window._jQsliders[i].activeHandle = 0;
+			}
 
 			this.dragging = !this.ranged || pos < wrapWidth / 2 ? 1 : 2;
 			this.activeHandle = this.dragging;
