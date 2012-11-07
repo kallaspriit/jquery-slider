@@ -472,8 +472,6 @@
 			} else {
 				this.setValue(changeValue);
 			}
-
-			console.log('key', e.keyCode, this.activeHandle, newValue);
 		};
 
 		this.jumpTo = function(clientX) {
