@@ -493,6 +493,7 @@
 				};
 
 			this.dragging = !this.ranged || pos < wrapWidth / 2 ? 1 : 2;
+			this.activeHandle = this.dragging;
 			this.onDragProgress(event);
 			this.dragging = 0;
 		};
