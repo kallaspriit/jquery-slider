@@ -14,10 +14,12 @@ Features
 * Provided example minimalistic stylesheet
 * Supports displaying range and current value
 * Supports setting step size
+* One can set value by clicking on the slider
+* Supports keyboard control of last selected handle (hold shift to go faster)
 * Works for any range including 0..1
 * Range and value can be updated at any time
 * Change events can be limited to minimal interval
-* It's tiny - just 8KB minified
+* It's small - just 10KB minified
 
 
 How to use
