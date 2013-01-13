@@ -10,8 +10,13 @@
 			onStart: null,
 			onChange: null,
 			onEnd: null,
-			minChangeInterval: 0
+			minChangeInterval: 0,
+			decimals: 1
 		};
+
+		var step = $(input).data('step') || 1;
+
+		this.defaults['decimals'] = step < 1 ? ((1 / step) + '').length - 1 : 0;
 
 		this.options = $.extend({}, this.defaults, options);
 		this.input = $(input);
@@ -117,18 +122,18 @@
 				this.value = $('#' + this.valueId);
 
 				if (!this.ranged) {
-					this.value.html(Math.round(this.startValue * 10) / 10);
+					this.value.html(this.round(this.startValue, this.options.decimals));
 				} else {
 					this.value.html(
-						(Math.round(this.startValueLeft * 10) / 10) + ' - ' +
-						(Math.round(this.startValueRight * 10) / 10)
+						this.round(this.startValueLeft, this.options.decimals) + ' - ' +
+						this.round(this.startValueRight, this.options.decimals)
 					);
 				}
 			}
 
 			if (this.options.showRange) {
 				var minValue = this.input.data('min') || 0,
-					maxValue = this.input.data('max') || 100
+					maxValue = this.input.data('max') || 100;
 
 				this.rangeMinId = 'slider-range-min-' + baseId;
 				this.rangeMaxId = 'slider-range-max-' + baseId;
@@ -170,7 +175,7 @@
 				});
 
 				$(document).one('mouseup', function(e) {
-					$(document).unbind('mousemove')
+					$(document).unbind('mousemove');
 
 					self.onDragEnd(e);
 				});
@@ -200,7 +205,7 @@
 					});
 
 					$(document).one('mouseup', function(e) {
-						$(document).unbind('mousemove')
+						$(document).unbind('mousemove');
 
 						self.onDragEnd(e);
 					});
@@ -230,11 +235,11 @@
 			});
 		};
 
-		this.onDragStart = function(e) {
+		this.onDragStart = function() {
 			this.disableTextSelect();
 		};
 
-		this.onDragStartLeft = function(e) {
+		this.onDragStartLeft = function() {
 			this.dragging = 1;
 
 			if (typeof(this.options.onStart) == 'function') {
@@ -246,7 +251,7 @@
 			}
 		};
 
-		this.onDragStartRight = function(e) {
+		this.onDragStartRight = function() {
 			this.dragging = 2;
 
 			if (typeof(this.options.onStart) == 'function') {
@@ -304,7 +309,7 @@
 				this.input.attr('value', value);
 
 				if (this.options.showValue) {
-					this.value.html(Math.round(value * 10) / 10);
+					this.value.html(this.round(value, this.options.decimals));
 				}
 
 				if (typeof(this.options.onChange) == 'function') {
@@ -353,8 +358,8 @@
 
 				if (this.options.showValue) {
 					this.value.html(
-						(Math.round(valueLeft * 10) / 10) + ' - ' +
-						(Math.round(valueRight * 10) / 10)
+						this.round(valueLeft, this.options.decimals) + ' - ' +
+						this.round(valueRight, this.options.decimals)
 					);
 				}
 
@@ -395,7 +400,7 @@
 			this.input.trigger('change');
 		};
 
-		this.onDragEnd = function(e) {
+		this.onDragEnd = function() {
 			if (this.dragging == 0) {
 				return;
 			}
@@ -442,8 +447,7 @@
 
 			var	minValue = parseInt(this.input.data('min')) || 0,
 				maxValue = parseInt(this.input.data('max')) || 100,
-				step = parseInt(this.input.data('step')) || 1,
-				newValue;
+				step = parseInt(this.input.data('step')) || 1;
 
 			if (e.shiftKey) {
 				step *= 10;
@@ -556,8 +560,8 @@
 
 				if (this.options.showValue) {
 					this.value.html(
-						(Math.round(valueLeft * 10) / 10) + ' - ' +
-						(Math.round(valueRight * 10) / 10)
+						this.round(valueLeft, this.options.decimals) + ' - ' +
+						this.round(valueRight, this.options.decimals)
 					);
 				}
 
@@ -590,7 +594,7 @@
 				this.input.attr('value', value);
 
 				if (this.options.showValue) {
-					this.value.html(Math.round(singleValue * 10) / 10);
+					this.value.html(this.round(singleValue, this.options.decimals));
 				}
 
 				if (typeof(this.options.onChange) == 'function') {
@@ -623,7 +627,15 @@
 		this.getMillitime = function() {
 			return (new Date()).getTime();
 		};
-	};
+
+		this.round = function(number, decimals) {
+			if (typeof(number) !== 'number') {
+				return number;
+			}
+
+			return number.toFixed(decimals);
+		};
+	}
 
 	Slider.prototype = {
 		init: function() {
@@ -710,5 +722,7 @@
 				}
 			});
 		}
+
+		return this;
 	};
 })(jQuery);
