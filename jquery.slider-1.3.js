@@ -11,7 +11,8 @@
 			onChange: null,
 			onEnd: null,
 			minChangeInterval: 0,
-			decimals: 1
+			decimals: 1,
+            flipswitch: false
 		};
 
 		var step = $('input').data('step') || 1;
@@ -25,16 +26,12 @@
 		this.startValue = 0;
 		this.startValueLeft = null;
 		this.startValueRight = null;
-		this.wrapId = null;
-		this.handleLeftId = null;
-		this.handleRightId = null;
-		this.connectorId = null;
-		this.trackId = null;
 		this.valueId = null;
 		this.rangeMinId = null;
 		this.rangeMaxId = null;
 		this.wrap = null;
 		this.handleLeft = null;
+        this.handleLeftWidth = 0;
 		this.handleRight = null;
 		this.connector = null;
 		this.value = null;
@@ -154,12 +151,15 @@
 
 			this.input.hide();
 			this.input.after(this.wrap);
-			
+
+            if (this.options.flipswitch) {
+                this.handleLeftWidth = this.handleLeft.width();
+            }
 		};
 
 		this.setupEvents = function() {
 			var self = this;
-			
+
 			this.handleLeft.on('mousedown touchstart', function(e) {
 				self.onDragStartLeft(e);
 				self.activeHandle = 1;
@@ -193,7 +193,7 @@
 				self.onDragProgress(e);
 			});
 
-			handle.one('mouseup touchend', function(e) {
+			$(document).one('mouseup touchend', function(e) {
 				self.document.off('mousemove touchmove');
 				handle.removeClass('slider-handle-active');
 				self.onDragEnd(e);
@@ -249,10 +249,11 @@
 			if (this.dragging == 0) {
 				return;
 			}
-			
+
 			var wrapLeft = this.wrap.offset().left,
 				wrapWidth = parseInt(this.wrap.width()),
-				pos = Math.min(Math.max(this.getClientX(e) - wrapLeft, 0), wrapWidth);
+				pos = Math.min(Math.max(this.getClientX(e) - wrapLeft, 0), wrapWidth),
+                posConnector;
 
 			if (this.ranged) {
 				var leftPos = this.handleLeft.position().left,
@@ -278,6 +279,15 @@
 
 			normalizedValue = (value - minValue) / range;
 			pos = wrapWidth * normalizedValue;
+            posConnector = pos;
+
+            if (this.options.flipswitch && pos > this.handleLeftWidth) {
+                pos -= this.handleLeftWidth;
+            }
+
+            if (this.options.flipswitch && pos > this.handleLeftWidth / 2) {
+                posConnector -= this.handleLeftWidth / 2;
+            }
 
 			if (!this.ranged) {
 				this.handleLeft.css({
@@ -285,7 +295,7 @@
 				});
 
 				this.connector.css({
-					width: pos
+					width: posConnector
 				});
 
 				this.input.attr('value', value);

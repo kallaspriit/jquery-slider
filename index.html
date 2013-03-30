@@ -32,7 +32,7 @@
 				font-weight: normal;
 			}
 			
-			/*custon slider styles*/
+			/*custom slider styles*/
 			#mobile-slider .jquery-slider {
 				height: 12px;
 				margin-top: 40px;
@@ -60,6 +60,70 @@
 			#mobile-slider .slider-handle-active {
 				background-color: #444;
 			}
+
+            /*flip switch*/
+
+            #switch {
+                width: 80px;
+            }
+            #switch .jquery-slider {
+                height: 34px;
+                margin: 40px 0 20px;
+
+            }
+            #switch .slider-track {
+                border-radius: 6px;
+                box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2);
+            }
+            #switch .slider-connector-left {
+                background-color: #edc43a;
+                box-shadow: inset 1px 1px 3px rgba(0,0,0,0.2);
+                border-radius: 6px 0 0 6px;
+                -webkit-transition: width 200ms ease;
+                -moz-transition: width 200ms ease;
+                transition: width 200ms ease;
+                -webkit-transform: translateZ(0);
+                -moz-transform: translateZ(0);
+                transform: translateZ(0);
+            }
+            #switch .slider-handle {
+                width: 22px;
+                height: 34px;
+                top: 0;
+                margin: 0 24px 0 0;
+                border-radius: 6px;
+                box-shadow: none;
+                -webkit-transition: left 200ms ease;
+                -moz-transition: left 200ms ease;
+                transition: left 200ms ease;
+                -webkit-transform: translateZ(0);
+                -moz-transform: translateZ(0);
+                transform: translateZ(0);
+            }
+            #switch .slider-handle-active {
+                background-color: #444;
+            }
+            #switch .slider-track::before,
+            #switch .slider-connector-left::before {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                text-align: center;
+                line-height: 34px;
+                text-transform: uppercase;
+                font-weight: bold;
+                color: #666;
+            }
+            #switch .slider-track::before {
+                content: 'off';
+                left: 10px;
+            }
+            #switch .slider-connector-left::before {
+                content: 'on';
+            }
+
 		</style>
 		
 	</head>
@@ -77,6 +141,7 @@
 			<p><input type="text" name="slider-options" id="slider-options" value="128" data-min="0" data-max="255"/></p>
 			<p><input type="text" name="slider-range" id="slider-range" value="64 192" data-min="0" data-max="255"/></p>
 			<p id="mobile-slider"><input type="text" name="slider-mobile" id="slider-mobile" data-step="5"/></p>
+            <p id="switch"><input type="text" name="slider-switch" id="slider-switch" data-step="1" data-min="0" data-max="1"/></p>
 			<p>
 				<button name="update-ranges" id="update-ranges">Update ranges</button> 
 				<button name="update-values" id="update-values">Update values</button>
@@ -137,6 +202,7 @@
 			});
 			
 			$('#slider-mobile').slider();
+            $('#slider-switch').slider({'flipswitch': true});
 		});
 
 		</script>
