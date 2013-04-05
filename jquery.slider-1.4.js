@@ -1,50 +1,78 @@
+/**
+ * Minimal, unobtrusive and simple to use horizontal jQuery slider plugin.
+ *
+ * Copyright (c) 2013 Priit Kallas <kallaspriit@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies
+ * or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * @author Priit Kallas <kallaspriit@gmail.com>
+ * @coauthor Taavi Sangel <taavi.sangel@gmail.com>
+ *
+ * TODO Default style for flip-switch
+ */
+
 (function($){
+	'use strict';
+
 	var instances = 0;
 
 	function Slider(input, options) {
 		this.defaults = {
-			classPrefix: '',
-			width: '100%',
-			showValue: false,
-			showRange: false,
-			onStart: null,
-			onChange: null,
-			onEnd: null,
-			minChangeInterval: 0,
-			decimals: 1,
-            flipswitch: false
+			classPrefix:            '',
+			width:                  '100%',
+			showValue:              false,
+			showRange:              false,
+			onStart:                null,
+			onChange:               null,
+			onEnd:                  null,
+			minChangeInterval:      0,
+			decimals:               1,
+            flipswitch:             false
 		};
 
-		var step = $('input').data('step') || 1;
-
-		this.defaults['decimals'] = step < 1 ? ((1 / step) + '').length - 1 : 0;
-
-		this.options = $.extend({}, this.defaults, options);
-		this.input = $(input);
-		this.dragging = 0;
-		this.ranged = false;
-		this.startValue = 0;
-		this.startValueLeft = null;
-		this.startValueRight = null;
-		this.valueId = null;
-		this.rangeMinId = null;
-		this.rangeMaxId = null;
-		this.wrap = null;
-		this.handleLeft = null;
-        this.handleLeftWidth = 0;
-		this.handleRight = null;
-		this.connector = null;
-		this.value = null;
-		this.rangeMin = null;
-		this.rangeMax = null;
-		this.lastChangeTime = null;
-		this.activeHandle = 0;
-		this.document = null;
+		this.input =                $(input);
+		this.step =                 this.input.data('step') || 1;
+		this.defaults.decimals =    this.step < 1 ? ((1 / this.step) + '').length - 1 : 0;
+		this.options =              $.extend({}, this.defaults, options);
+		this.dragging =             0;
+		this.ranged =               false;
+		this.startValue =           0;
+		this.startValueLeft =       null;
+		this.startValueRight =      null;
+		this.valueId =              null;
+		this.rangeMinId =           null;
+		this.rangeMaxId =           null;
+		this.wrap =                 null;
+		this.handleLeft =           null;
+        this.handleLeftWidth =      0;
+		this.handleRight =          null;
+		this.connector =            null;
+		this.value =                null;
+		this.rangeMin =             null;
+		this.rangeMax =             null;
+		this.lastChangeTime =       null;
+		this.activeHandle =         0;
+		this.document =             null;
 
 		this.setupDom = function() {
-			
-			this.document = $(document);
 			instances++;
+
+			this.document = $(document);
 
 			// check for range slider
 			this.startValue = this.input.val();
@@ -52,7 +80,7 @@
 			if (this.startValue.indexOf(' ') != -1) {
 				var startValues = this.startValue.split(' ');
 
-				this.startValueLeft = parseInt(startValues[0]);
+				this.startValueLeft = parseInt(startValues[0], 10);
 				this.startValueRight = startValues[1];
 
 				this.startValue = this.startValueLeft;
@@ -62,40 +90,41 @@
 			// create the main wrap
 			var baseId = this.input.attr('id');
 
-			if (baseId == null) {
+			if (typeof(baseId) !== 'string') {
 				baseId = instances;
 			}
-			
+
 			this.wrap = $('<div/>', {
-				'id': 'slider-wrap-' + baseId,
-				'class': this.options.classPrefix + 'slider-wrap jquery-slider'
+				id: 'slider-wrap-' + baseId,
+				class: this.options.classPrefix + 'slider-wrap jquery-slider'
 			}).css({
-				'width': this.options.width
+				width: this.options.width
 			});
 
 			// add track
-			this.track = $('<div/>', {
-				'id': 'slider-track-' + baseId,
-				'class': this.options.classPrefix + 'slider-track'
+			$('<div/>', {
+				id: 'slider-track-' + baseId,
+				class: this.options.classPrefix + 'slider-track'
 			}).appendTo(this.wrap);
-			
+
 			// add connector
 			this.connector = $('<div/>', {
-				'id': 'slider-connector-left-' + baseId,
-				'class': this.options.classPrefix + 'slider-connector-left'
+				id: 'slider-connector-left-' + baseId,
+				class: this.options.classPrefix + 'slider-connector-left'
 			}).appendTo(this.wrap);
 
 			// add left handle
 			this.handleLeft = $('<div/>', {
-				'id': 'slider-handle-left-' + baseId,
-				'class': this.options.classPrefix + 'slider-handle ' + this.options.classPrefix + 'slider-handle-left'
+				id: 'slider-handle-left-' + baseId,
+				class: this.options.classPrefix + 'slider-handle ' + this.options.classPrefix + 'slider-handle-left'
 			}).appendTo(this.wrap);
-			
+
 			//add right handle
 			if (this.ranged) {
 				this.handleRight = $('<div/>', {
-					'id': 'slider-handle-right-' + baseId,
-					'class': this.options.classPrefix + 'slider-handle ' + this.options.classPrefix + 'slider-handle-right'
+					id: 'slider-handle-right-' + baseId,
+					class: this.options.classPrefix + 'slider-handle '
+						+ this.options.classPrefix + 'slider-handle-right'
 				}).appendTo(this.wrap);
 			}
 
@@ -104,8 +133,8 @@
 				this.valueId = 'slider-value-' + baseId;
 
 				this.value = $('<div/>', {
-					'id': this.valueId,
-					'class': this.options.classPrefix + 'slider-value'
+					id: this.valueId,
+					class: this.options.classPrefix + 'slider-value'
 				}).appendTo(this.wrap);
 
 				this.wrap.addClass('with-value');
@@ -128,13 +157,13 @@
 				this.rangeMaxId = 'slider-range-max-' + baseId;
 
 				this.wrap.append($('<div/>', {
-					'id': this.rangeMinId,
-					'class': this.options.classPrefix + 'slider-range-min'
+					id: this.rangeMinId,
+					class: this.options.classPrefix + 'slider-range-min'
 				}));
 
 				this.wrap.append($('<div/>', {
-					'id': this.rangeMaxId,
-					'class': this.options.classPrefix + 'slider-range-max'
+					id: this.rangeMaxId,
+					class: this.options.classPrefix + 'slider-range-max'
 				}));
 
 				this.wrap.addClass('with-range');
@@ -182,13 +211,15 @@
 				self.jumpTo(self.getClientX(e));
 			});
 		};
-		
+
 		this.bindEventsTo = function(handle, e) {
-			var self = this;
-			
+			var self = this,
+				i;
+
 			handle.addClass('slider-handle-active');
+
 			this.onDragStart(e);
-				
+
 			this.document.on('mousemove touchmove' ,function(e) {
 				self.onDragProgress(e);
 			});
@@ -199,7 +230,7 @@
 				self.onDragEnd(e);
 			});
 
-			for (var i = 0; i < window._jQsliders.length; i++) {
+			for (i = 0; i < window._jQsliders.length; i++) {
 				window._jQsliders[i].activeHandle = 0;
 			}
 
@@ -235,23 +266,22 @@
 				this.options.onStartRight(this.input[0]);
 			}
 		};
-		
+
 		this.getClientX = function(e) {
-			//check if user is using touch device
 			if (typeof(e.clientX) === 'undefined') {
-				return e.originalEvent.touches[0].pageX;
+				return e.originalEvent.touches[0].pageX; // touch device
 			} else {
 				return e.clientX;
 			}
 		};
-		
+
 		this.onDragProgress = function(e) {
-			if (this.dragging == 0) {
+			if (this.dragging === 0) {
 				return;
 			}
 
 			var wrapLeft = this.wrap.offset().left,
-				wrapWidth = parseInt(this.wrap.width()),
+				wrapWidth = parseInt(this.wrap.width(), 10),
 				pos = Math.min(Math.max(this.getClientX(e) - wrapLeft, 0), wrapWidth),
                 posConnector;
 
@@ -259,9 +289,9 @@
 				var leftPos = this.handleLeft.position().left,
 					rightPos = this.handleRight.position().left;
 
-				if (this.dragging == 1 && pos > rightPos) {
+				if (this.dragging === 1 && pos > rightPos) {
 					pos = rightPos;
-				} else if (this.dragging == 2 && pos < leftPos) {
+				} else if (this.dragging === 2 && pos < leftPos) {
 					pos = leftPos;
 				}
 			}
@@ -305,14 +335,14 @@
 				}
 
 				if (typeof(this.options.onChange) == 'function') {
-					if (this.options.minChangeInterval == 0) {
+					if (this.options.minChangeInterval === 0) {
 						this.options.onChange(value, this.input[0]);
 					} else {
 						currentTime = this.getMillitime();
 						sinceLast = currentTime - this.lastChangeTime;
 
 						if (
-							this.options.minChangeInterval == null
+							this.options.minChangeInterval === null
 							|| sinceLast >= this.options.minChangeInterval
 						) {
 							this.options.onChange(value, this.input[0]);
@@ -325,8 +355,8 @@
 						? this.handleLeft
 						: this.handleRight,
 					currentValues = this.input.val().split(' '),
-					valueLeft = parseInt(currentValues[0]),
-					valueRight = parseInt(currentValues[1]);
+					valueLeft = parseInt(currentValues[0], 10),
+					valueRight = parseInt(currentValues[1], 10);
 
 				handle.css({
 					left: pos
@@ -364,7 +394,7 @@
 				}
 
 				if (typeof(this.options.onChange) == 'function') {
-					if (this.options.minChangeInterval == 0) {
+					if (this.options.minChangeInterval === 0) {
 						this.options.onChange(
 							valueLeft,
 							valueRight,
@@ -375,7 +405,7 @@
 						sinceLast = currentTime - this.lastChangeTime;
 
 						if (
-							this.options.minChangeInterval == null
+							this.options.minChangeInterval === null
 							|| sinceLast >= this.options.minChangeInterval
 						) {
 							this.options.onChange(
@@ -393,7 +423,7 @@
 		};
 
 		this.onDragEnd = function() {
-			if (this.dragging == 0) {
+			if (this.dragging === 0) {
 				return;
 			}
 
@@ -412,7 +442,7 @@
 
 		this.onKeyDown = function(e) {
 			if (
-				this.activeHandle == 0
+				this.activeHandle === 0
 				|| (e.keyCode != 37 && e.keyCode != 39)
 			) {
 				return;
@@ -424,8 +454,8 @@
 				changeValue;
 
 			if (this.ranged) {
-				leftValue = parseInt(rawValue.split(' ')[0]);
-				rightValue = parseInt(rawValue.split(' ')[1]);
+				leftValue = parseInt(rawValue.split(' ')[0], 10);
+				rightValue = parseInt(rawValue.split(' ')[1], 10);
 
 				if (this.activeHandle == 1) {
 					changeValue = leftValue;
@@ -433,13 +463,13 @@
 					changeValue = rightValue;
 				}
 			} else {
-				leftValue = parseInt(rawValue);
+				leftValue = parseInt(rawValue, 10);
 				changeValue = leftValue;
 			}
 
-			var	minValue = parseInt(this.input.data('min')) || 0,
-				maxValue = parseInt(this.input.data('max')) || 100,
-				step = parseInt(this.input.data('step')) || 1;
+			var	minValue = parseInt(this.input.data('min'), 10) || 0,
+				maxValue = parseInt(this.input.data('max'), 10) || 100,
+				step = parseInt(this.input.data('step'), 10) || 1;
 
 			if (e.shiftKey) {
 				step *= 10;
@@ -471,12 +501,12 @@
 		};
 
 		this.jumpTo = function(clientX) {
-			if (this.dragging != 0) {
+			if (this.dragging !== 0) {
 				return;
 			}
 
 			var wrapLeft = this.wrap.offset().left,
-				wrapWidth = parseInt(this.wrap.width()),
+				wrapWidth = parseInt(this.wrap.width(), 10),
 				pos = Math.min(Math.max(clientX - wrapLeft, 0), wrapWidth),
 				event = {
 					clientX: clientX
@@ -498,7 +528,7 @@
 			if (typeof(value) == 'string' && value.indexOf(' ') != -1) {
 				var startValues = value.split(' ');
 
-				this.startValueLeft = parseInt(startValues[0]);
+				this.startValueLeft = parseInt(startValues[0], 10);
 				this.startValueRight = startValues[1];
 
 				this.startValue = this.startValueLeft;
@@ -509,7 +539,7 @@
 				maxValue = this.input.data('max') || 100,
 				step = this.input.data('step') || 1,
 				range = maxValue - minValue,
-				wrapWidth = parseInt(this.wrap.width());
+				wrapWidth = parseInt(this.wrap.width(), 10);
 
 			if (this.ranged) {
 				if (this.startValueLeft < minValue) {
@@ -601,19 +631,19 @@
 		};
 
 		this.disableTextSelect = function() {
-//			$('*')
-//				.attr('unselectable', 'on')
-//				.css('user-select', 'none')
-//				.on('selectstart', false)
-//				.addClass('slider-unselectable');
+			$('*')
+				.attr('unselectable', 'on')
+				.css('user-select', 'none')
+				.on('selectstart', false)
+				.addClass('slider-unselectable');
 		};
 
 		this.enableTextSelect = function() {
-//			$('*')
-//				.removeAttr('unselectable')
-//				.css('user-select', '')
-//				.unbind('selectstart')
-//				.removeClass('slider-unselectable');
+			$('*')
+				.removeAttr('unselectable')
+				.css('user-select', '')
+				.unbind('selectstart')
+				.removeClass('slider-unselectable');
 		};
 
 		this.getMillitime = function() {
@@ -667,9 +697,9 @@
 
 		val: function(value, right) {
 			if (typeof(right) != 'undefined') {
-				value = parseInt(value) + ' ' + parseInt(right);
-			} else if (parseInt(value) == value) {
-				value = parseInt(value);
+				value = parseInt(value, 10) + ' ' + parseInt(right, 10);
+			} else if (parseInt(value, 10) == value) {
+				value = parseInt(value, 10);
 			}
 
 			this.setValue(value);
@@ -695,14 +725,14 @@
 			this.each(function() {
 				var slider = $(this).data('slider');
 
-				if (slider == null) {
+				if (typeof(slider) !== 'object') {
 					slider = new Slider(this, options);
 
 					slider.init();
 
 					$(this).data('slider', slider);
 				} else {
-					if (args.length == 0) {
+					if (args.length === 0) {
 						return;
 					}
 

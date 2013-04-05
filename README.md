@@ -8,6 +8,8 @@ Features
 * Very easy to use
 * Transforms text-inputs so works without JavaScript
 * Normal 'change' event of input element works
+* Works with touch devices
+* Can behave like a flip-switch
 * You can always read the value from the original input that is kept updated
 * Supports single and ranged slider types
 * Simple to change appearance using CSS
@@ -20,6 +22,7 @@ Features
 * Range and value can be updated at any time
 * Change events can be limited to minimal interval
 * It's small - just 10KB minified
+* Licenced under MIT - do whatever you want with it
 
 
 How to use
@@ -99,6 +102,7 @@ Options
 * **onChange** - called every time value changes at most every minChangeInterval
 * **onEnd** - called when a value is selected
 * **minChangeInterval** - at most how often to call the onChange callback
+* **flipswitch** - should the slider behave like a flip-switch
 
 Functions
 -------
