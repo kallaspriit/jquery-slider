@@ -11,10 +11,11 @@
 			onChange: null,
 			onEnd: null,
 			minChangeInterval: 0,
-			decimals: 1
+			decimals: 1,
+            flipswitch: false
 		};
 
-		var step = $(input).data('step') || 1;
+		var step = $('input').data('step') || 1;
 
 		this.defaults['decimals'] = step < 1 ? ((1 / step) + '').length - 1 : 0;
 
@@ -25,15 +26,12 @@
 		this.startValue = 0;
 		this.startValueLeft = null;
 		this.startValueRight = null;
-		this.wrapId = null;
-		this.handleLeftId = null;
-		this.handleRightId = null;
-		this.connectorId = null;
 		this.valueId = null;
 		this.rangeMinId = null;
 		this.rangeMaxId = null;
 		this.wrap = null;
 		this.handleLeft = null;
+        this.handleLeftWidth = 0;
 		this.handleRight = null;
 		this.connector = null;
 		this.value = null;
@@ -41,8 +39,11 @@
 		this.rangeMax = null;
 		this.lastChangeTime = null;
 		this.activeHandle = 0;
+		this.document = null;
 
 		this.setupDom = function() {
+			
+			this.document = $(document);
 			instances++;
 
 			// check for range slider
@@ -64,67 +65,55 @@
 			if (baseId == null) {
 				baseId = instances;
 			}
-
-			this.wrapId = 'slider-wrap-' + baseId;
-
-			this.input.after($('<div/>', {
-				'id': this.wrapId,
-				'class': this.options.classPrefix + 'slider-wrap'
-			}));
-
-			this.wrap = $('#' + this.wrapId);
-			this.wrap.css({
-				width: this.options.width
+			
+			this.wrap = $('<div/>', {
+				'id': 'slider-wrap-' + baseId,
+				'class': this.options.classPrefix + 'slider-wrap jquery-slider'
+			}).css({
+				'width': this.options.width
 			});
 
+			// add track
+			this.track = $('<div/>', {
+				'id': 'slider-track-' + baseId,
+				'class': this.options.classPrefix + 'slider-track'
+			}).appendTo(this.wrap);
+			
 			// add connector
-			this.connectorId = 'slider-connector-left-' + baseId;
-
-			this.wrap.append($('<div/>', {
-				'id': this.connectorId,
+			this.connector = $('<div/>', {
+				'id': 'slider-connector-left-' + baseId,
 				'class': this.options.classPrefix + 'slider-connector-left'
-			}));
-
-			this.connector = $('#' + this.connectorId);
+			}).appendTo(this.wrap);
 
 			// add left handle
-			this.handleLeftId = 'slider-handle-left-' + baseId;
-
-			this.wrap.append($('<div/>', {
-				'id': this.handleLeftId,
-				'class': this.options.classPrefix + 'slider-handle-left'
-			}));
-
-			this.handleLeft = $('#' + this.handleLeftId);
-
+			this.handleLeft = $('<div/>', {
+				'id': 'slider-handle-left-' + baseId,
+				'class': this.options.classPrefix + 'slider-handle ' + this.options.classPrefix + 'slider-handle-left'
+			}).appendTo(this.wrap);
+			
+			//add right handle
 			if (this.ranged) {
-				this.handleRightId = 'slider-handle-right-' + baseId;
-
-				this.wrap.append($('<div/>', {
-					'id': this.handleRightId,
-					'class': this.options.classPrefix + 'slider-handle-right'
-				}));
-
-				this.handleRight = $('#' + this.handleRightId);
+				this.handleRight = $('<div/>', {
+					'id': 'slider-handle-right-' + baseId,
+					'class': this.options.classPrefix + 'slider-handle ' + this.options.classPrefix + 'slider-handle-right'
+				}).appendTo(this.wrap);
 			}
 
 			// add labels
 			if (this.options.showValue) {
 				this.valueId = 'slider-value-' + baseId;
 
-				this.wrap.append($('<div/>', {
+				this.value = $('<div/>', {
 					'id': this.valueId,
 					'class': this.options.classPrefix + 'slider-value'
-				}));
+				}).appendTo(this.wrap);
 
 				this.wrap.addClass('with-value');
 
-				this.value = $('#' + this.valueId);
-
 				if (!this.ranged) {
-					this.value.html(this.round(this.startValue, this.options.decimals));
+					this.value.text(this.round(this.startValue, this.options.decimals));
 				} else {
-					this.value.html(
+					this.value.text(
 						this.round(this.startValueLeft, this.options.decimals) + ' - ' +
 						this.round(this.startValueRight, this.options.decimals)
 					);
@@ -161,68 +150,27 @@
 			this.setValue(this.input.val());
 
 			this.input.hide();
+			this.input.after(this.wrap);
+
+            if (this.options.flipswitch) {
+                this.handleLeftWidth = this.handleLeft.width();
+            }
 		};
 
 		this.setupEvents = function() {
 			var self = this;
 
-			this.handleLeft.mousedown(function(e) {
-				self.onDragStart(e);
+			this.handleLeft.on('mousedown touchstart', function(e) {
 				self.onDragStartLeft(e);
-
-				$(document).unbind('mousemove').mousemove(function(e) {
-					self.onDragProgress(e);
-				});
-
-				$(document).one('mouseup', function(e) {
-					$(document).unbind('mousemove');
-
-					self.onDragEnd(e);
-				});
-
-				$(document).one('mousedown', function() {
-					self.activeHandle = 0;
-				});
-
-				for (var i = 0; i < window._jQsliders.length; i++) {
-					window._jQsliders[i].activeHandle = 0;
-				}
-
 				self.activeHandle = 1;
-
-				e.preventDefault();
-
-				return false;
+				self.bindEventsTo(self.handleLeft, e);
 			});
 
 			if (this.ranged) {
-				this.handleRight.mousedown(function(e) {
-					self.onDragStart(e);
+				this.handleRight.on('mousedown touchstart', function(e) {
 					self.onDragStartRight(e);
-
-					$(document).unbind('mousemove').mousemove(function(e) {
-						self.onDragProgress(e);
-					});
-
-					$(document).one('mouseup', function(e) {
-						$(document).unbind('mousemove');
-
-						self.onDragEnd(e);
-					});
-
-					$(document).one('mousedown', function() {
-						self.activeHandle = 0;
-					});
-
-					for (var i = 0; i < window._jQsliders.length; i++) {
-						window._jQsliders[i].activeHandle = 0;
-					}
-
 					self.activeHandle = 2;
-
-					e.preventDefault();
-
-					return false;
+					self.bindEventsTo(self.handleRight, e);
 				});
 			}
 
@@ -230,9 +178,34 @@
 				self.onKeyDown(e);
 			});
 
-			this.wrap.click(function(e) {
-				self.jumpTo(e.clientX);
+			this.wrap.on('click tap' ,function(e) {
+				self.jumpTo(self.getClientX(e));
 			});
+		};
+		
+		this.bindEventsTo = function(handle, e) {
+			var self = this;
+			
+			handle.addClass('slider-handle-active');
+			this.onDragStart(e);
+				
+			this.document.on('mousemove touchmove' ,function(e) {
+				self.onDragProgress(e);
+			});
+
+			$(document).one('mouseup touchend', function(e) {
+				self.document.off('mousemove touchmove');
+				handle.removeClass('slider-handle-active');
+				self.onDragEnd(e);
+			});
+
+			for (var i = 0; i < window._jQsliders.length; i++) {
+				window._jQsliders[i].activeHandle = 0;
+			}
+
+			e.preventDefault();
+
+			return false;
 		};
 
 		this.onDragStart = function() {
@@ -262,7 +235,16 @@
 				this.options.onStartRight(this.input[0]);
 			}
 		};
-
+		
+		this.getClientX = function(e) {
+			//check if user is using touch device
+			if (typeof(e.clientX) === 'undefined') {
+				return e.originalEvent.touches[0].pageX;
+			} else {
+				return e.clientX;
+			}
+		};
+		
 		this.onDragProgress = function(e) {
 			if (this.dragging == 0) {
 				return;
@@ -270,7 +252,8 @@
 
 			var wrapLeft = this.wrap.offset().left,
 				wrapWidth = parseInt(this.wrap.width()),
-				pos = Math.min(Math.max(e.clientX - wrapLeft, 0), wrapWidth);
+				pos = Math.min(Math.max(this.getClientX(e) - wrapLeft, 0), wrapWidth),
+                posConnector;
 
 			if (this.ranged) {
 				var leftPos = this.handleLeft.position().left,
@@ -296,6 +279,15 @@
 
 			normalizedValue = (value - minValue) / range;
 			pos = wrapWidth * normalizedValue;
+            posConnector = pos;
+
+            if (this.options.flipswitch && pos > this.handleLeftWidth) {
+                pos -= this.handleLeftWidth;
+            }
+
+            if (this.options.flipswitch && pos > this.handleLeftWidth / 2) {
+                posConnector -= this.handleLeftWidth / 2;
+            }
 
 			if (!this.ranged) {
 				this.handleLeft.css({
@@ -303,7 +295,7 @@
 				});
 
 				this.connector.css({
-					width: pos
+					width: posConnector
 				});
 
 				this.input.attr('value', value);
@@ -609,19 +601,19 @@
 		};
 
 		this.disableTextSelect = function() {
-			$('*')
-				.attr('unselectable', 'on')
-				.css('user-select', 'none')
-				.on('selectstart', false)
-				.addClass('slider-unselectable');
+//			$('*')
+//				.attr('unselectable', 'on')
+//				.css('user-select', 'none')
+//				.on('selectstart', false)
+//				.addClass('slider-unselectable');
 		};
 
 		this.enableTextSelect = function() {
-			$('*')
-				.removeAttr('unselectable')
-				.css('user-select', '')
-				.unbind('selectstart')
-				.removeClass('slider-unselectable');
+//			$('*')
+//				.removeAttr('unselectable')
+//				.css('user-select', '')
+//				.unbind('selectstart')
+//				.removeClass('slider-unselectable');
 		};
 
 		this.getMillitime = function() {
