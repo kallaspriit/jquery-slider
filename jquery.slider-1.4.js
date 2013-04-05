@@ -1,44 +1,78 @@
+/**
+ * Minimal, unobtrusive and simple to use horizontal jQuery slider plugin.
+ *
+ * Copyright (c) 2013 Priit Kallas <kallaspriit@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this
+ * software and associated documentation files (the "Software"), to deal in the Software
+ * without restriction, including without limitation the rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+ * permit persons to whom the Software is furnished to do so, subject to the following
+ * conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies
+ * or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * @author Priit Kallas <kallaspriit@gmail.com>
+ * @coauthor Taavi Sangel <taavi.sangel@gmail.com>
+ *
+ * TODO Default style for flip-switch
+ */
+
 (function($){
+	'use strict';
+
 	var instances = 0;
 
 	function Slider(input, options) {
 		this.defaults = {
-			classPrefix: '',
-			width: '100%',
-			showValue: false,
-			showRange: false,
-			onStart: null,
-			onChange: null,
-			onEnd: null,
-			minChangeInterval: 0
+			classPrefix:            '',
+			width:                  '100%',
+			showValue:              false,
+			showRange:              false,
+			onStart:                null,
+			onChange:               null,
+			onEnd:                  null,
+			minChangeInterval:      0,
+			decimals:               1,
+            flipswitch:             false
 		};
 
-		this.options = $.extend({}, this.defaults, options);
-		this.input = $(input);
-		this.dragging = 0;
-		this.ranged = false;
-		this.startValue = 0;
-		this.startValueLeft = null;
-		this.startValueRight = null;
-		this.wrapId = null;
-		this.handleLeftId = null;
-		this.handleRightId = null;
-		this.connectorId = null;
-		this.valueId = null;
-		this.rangeMinId = null;
-		this.rangeMaxId = null;
-		this.wrap = null;
-		this.handleLeft = null;
-		this.handleRight = null;
-		this.connector = null;
-		this.value = null;
-		this.rangeMin = null;
-		this.rangeMax = null;
-		this.lastChangeTime = null;
-		this.activeHandle = 0;
+		this.input =                $(input);
+		this.step =                 this.input.data('step') || 1;
+		this.defaults.decimals =    this.step < 1 ? ((1 / this.step) + '').length - 1 : 0;
+		this.options =              $.extend({}, this.defaults, options);
+		this.dragging =             0;
+		this.ranged =               false;
+		this.startValue =           0;
+		this.startValueLeft =       null;
+		this.startValueRight =      null;
+		this.valueId =              null;
+		this.rangeMinId =           null;
+		this.rangeMaxId =           null;
+		this.wrap =                 null;
+		this.handleLeft =           null;
+        this.handleLeftWidth =      0;
+		this.handleRight =          null;
+		this.connector =            null;
+		this.value =                null;
+		this.rangeMin =             null;
+		this.rangeMax =             null;
+		this.lastChangeTime =       null;
+		this.activeHandle =         0;
+		this.document =             null;
 
 		this.setupDom = function() {
 			instances++;
+
+			this.document = $(document);
 
 			// check for range slider
 			this.startValue = this.input.val();
@@ -46,7 +80,7 @@
 			if (this.startValue.indexOf(' ') != -1) {
 				var startValues = this.startValue.split(' ');
 
-				this.startValueLeft = parseInt(startValues[0]);
+				this.startValueLeft = parseInt(startValues[0], 10);
 				this.startValueRight = startValues[1];
 
 				this.startValue = this.startValueLeft;
@@ -56,91 +90,80 @@
 			// create the main wrap
 			var baseId = this.input.attr('id');
 
-			if (baseId == null) {
+			if (typeof(baseId) !== 'string') {
 				baseId = instances;
 			}
 
-			this.wrapId = 'slider-wrap-' + baseId;
-
-			this.input.after($('<div/>', {
-				'id': this.wrapId,
-				'class': this.options.classPrefix + 'slider-wrap'
-			}));
-
-			this.wrap = $('#' + this.wrapId);
-			this.wrap.css({
+			this.wrap = $('<div/>', {
+				id: 'slider-wrap-' + baseId,
+				class: this.options.classPrefix + 'slider-wrap jquery-slider'
+			}).css({
 				width: this.options.width
 			});
 
+			// add track
+			$('<div/>', {
+				id: 'slider-track-' + baseId,
+				class: this.options.classPrefix + 'slider-track'
+			}).appendTo(this.wrap);
+
 			// add connector
-			this.connectorId = 'slider-connector-left-' + baseId;
-
-			this.wrap.append($('<div/>', {
-				'id': this.connectorId,
-				'class': this.options.classPrefix + 'slider-connector-left'
-			}));
-
-			this.connector = $('#' + this.connectorId);
+			this.connector = $('<div/>', {
+				id: 'slider-connector-left-' + baseId,
+				class: this.options.classPrefix + 'slider-connector-left'
+			}).appendTo(this.wrap);
 
 			// add left handle
-			this.handleLeftId = 'slider-handle-left-' + baseId;
+			this.handleLeft = $('<div/>', {
+				id: 'slider-handle-left-' + baseId,
+				class: this.options.classPrefix + 'slider-handle ' + this.options.classPrefix + 'slider-handle-left'
+			}).appendTo(this.wrap);
 
-			this.wrap.append($('<div/>', {
-				'id': this.handleLeftId,
-				'class': this.options.classPrefix + 'slider-handle-left'
-			}));
-
-			this.handleLeft = $('#' + this.handleLeftId);
-
+			//add right handle
 			if (this.ranged) {
-				this.handleRightId = 'slider-handle-right-' + baseId;
-
-				this.wrap.append($('<div/>', {
-					'id': this.handleRightId,
-					'class': this.options.classPrefix + 'slider-handle-right'
-				}));
-
-				this.handleRight = $('#' + this.handleRightId);
+				this.handleRight = $('<div/>', {
+					id: 'slider-handle-right-' + baseId,
+					class: this.options.classPrefix + 'slider-handle '
+						+ this.options.classPrefix + 'slider-handle-right'
+				}).appendTo(this.wrap);
 			}
 
 			// add labels
 			if (this.options.showValue) {
 				this.valueId = 'slider-value-' + baseId;
 
-				this.wrap.append($('<div/>', {
-					'id': this.valueId,
-					'class': this.options.classPrefix + 'slider-value'
-				}));
+				this.value = $('<div/>', {
+					id: this.valueId,
+					class: this.options.classPrefix + 'slider-value'
+				}).appendTo(this.wrap);
 
 				this.wrap.addClass('with-value');
 
-				this.value = $('#' + this.valueId);
-
 				if (!this.ranged) {
-					this.value.html(Math.round(this.startValue * 10) / 10);
+					this.value.text(this.round(this.startValue, this.options.decimals));
 				} else {
-					this.value.html(
-						(Math.round(this.startValueLeft * 10) / 10) + ' - ' +
-						(Math.round(this.startValueRight * 10) / 10)
+					this.value.text(
+						this.round(this.startValueLeft, this.options.decimals) + ' - ' +
+						this.round(this.startValueRight, this.options.decimals)
 					);
 				}
 			}
 
 			if (this.options.showRange) {
 				var minValue = this.input.data('min') || 0,
-					maxValue = this.input.data('max') || 100
+					maxValue = this.input.data('max') || 100;
 
 				this.rangeMinId = 'slider-range-min-' + baseId;
 				this.rangeMaxId = 'slider-range-max-' + baseId;
 
 				this.wrap.append($('<div/>', {
-					'id': this.rangeMinId,
-					'class': this.options.classPrefix + 'slider-range-min'
+					id: this.rangeMinId,
+					class: this.options.classPrefix + 'slider-range-min'
 				}));
 
 				this.wrap.append($('<div/>', {
-					'id': this.rangeMaxId,
-					'class': this.options.classPrefix + 'slider-range-max'
+					id: this.rangeMaxId,
+					class: this.options.classPrefix + 'slider-range-max'
 				}));
 
 				this.wrap.addClass('with-range');
@@ -156,68 +179,27 @@
 			this.setValue(this.input.val());
 
 			this.input.hide();
+			this.input.after(this.wrap);
+
+            if (this.options.flipswitch) {
+                this.handleLeftWidth = this.handleLeft.width();
+            }
 		};
 
 		this.setupEvents = function() {
 			var self = this;
 
-			this.handleLeft.mousedown(function(e) {
-				self.onDragStart(e);
+			this.handleLeft.on('mousedown touchstart', function(e) {
 				self.onDragStartLeft(e);
-
-				$(document).unbind('mousemove').mousemove(function(e) {
-					self.onDragProgress(e);
-				});
-
-				$(document).one('mouseup', function(e) {
-					$(document).unbind('mousemove')
-
-					self.onDragEnd(e);
-				});
-
-				$(document).one('mousedown', function() {
-					self.activeHandle = 0;
-				});
-
-				for (var i = 0; i < window._jQsliders.length; i++) {
-					window._jQsliders[i].activeHandle = 0;
-				}
-
 				self.activeHandle = 1;
-
-				e.preventDefault();
-
-				return false;
+				self.bindEventsTo(self.handleLeft, e);
 			});
 
 			if (this.ranged) {
-				this.handleRight.mousedown(function(e) {
-					self.onDragStart(e);
+				this.handleRight.on('mousedown touchstart', function(e) {
 					self.onDragStartRight(e);
-
-					$(document).unbind('mousemove').mousemove(function(e) {
-						self.onDragProgress(e);
-					});
-
-					$(document).one('mouseup', function(e) {
-						$(document).unbind('mousemove')
-
-						self.onDragEnd(e);
-					});
-
-					$(document).one('mousedown', function() {
-						self.activeHandle = 0;
-					});
-
-					for (var i = 0; i < window._jQsliders.length; i++) {
-						window._jQsliders[i].activeHandle = 0;
-					}
-
 					self.activeHandle = 2;
-
-					e.preventDefault();
-
-					return false;
+					self.bindEventsTo(self.handleRight, e);
 				});
 			}
 
@@ -225,16 +207,43 @@
 				self.onKeyDown(e);
 			});
 
-			this.wrap.click(function(e) {
-				self.jumpTo(e.clientX);
+			this.wrap.on('click tap' ,function(e) {
+				self.jumpTo(self.getClientX(e));
 			});
 		};
 
-		this.onDragStart = function(e) {
+		this.bindEventsTo = function(handle, e) {
+			var self = this,
+				i;
+
+			handle.addClass('slider-handle-active');
+
+			this.onDragStart(e);
+
+			this.document.on('mousemove touchmove' ,function(e) {
+				self.onDragProgress(e);
+			});
+
+			$(document).one('mouseup touchend', function(e) {
+				self.document.off('mousemove touchmove');
+				handle.removeClass('slider-handle-active');
+				self.onDragEnd(e);
+			});
+
+			for (i = 0; i < window._jQsliders.length; i++) {
+				window._jQsliders[i].activeHandle = 0;
+			}
+
+			e.preventDefault();
+
+			return false;
+		};
+
+		this.onDragStart = function() {
 			this.disableTextSelect();
 		};
 
-		this.onDragStartLeft = function(e) {
+		this.onDragStartLeft = function() {
 			this.dragging = 1;
 
 			if (typeof(this.options.onStart) == 'function') {
@@ -246,7 +255,7 @@
 			}
 		};
 
-		this.onDragStartRight = function(e) {
+		this.onDragStartRight = function() {
 			this.dragging = 2;
 
 			if (typeof(this.options.onStart) == 'function') {
@@ -258,22 +267,31 @@
 			}
 		};
 
+		this.getClientX = function(e) {
+			if (typeof(e.clientX) === 'undefined') {
+				return e.originalEvent.touches[0].pageX; // touch device
+			} else {
+				return e.clientX;
+			}
+		};
+
 		this.onDragProgress = function(e) {
-			if (this.dragging == 0) {
+			if (this.dragging === 0) {
 				return;
 			}
 
 			var wrapLeft = this.wrap.offset().left,
-				wrapWidth = parseInt(this.wrap.width()),
-				pos = Math.min(Math.max(e.clientX - wrapLeft, 0), wrapWidth);
+				wrapWidth = parseInt(this.wrap.width(), 10),
+				pos = Math.min(Math.max(this.getClientX(e) - wrapLeft, 0), wrapWidth),
+                posConnector;
 
 			if (this.ranged) {
 				var leftPos = this.handleLeft.position().left,
 					rightPos = this.handleRight.position().left;
 
-				if (this.dragging == 1 && pos > rightPos) {
+				if (this.dragging === 1 && pos > rightPos) {
 					pos = rightPos;
-				} else if (this.dragging == 2 && pos < leftPos) {
+				} else if (this.dragging === 2 && pos < leftPos) {
 					pos = leftPos;
 				}
 			}
@@ -291,6 +309,15 @@
 
 			normalizedValue = (value - minValue) / range;
 			pos = wrapWidth * normalizedValue;
+            posConnector = pos;
+
+            if (this.options.flipswitch && pos > this.handleLeftWidth) {
+                pos -= this.handleLeftWidth;
+            }
+
+            if (this.options.flipswitch && pos > this.handleLeftWidth / 2) {
+                posConnector -= this.handleLeftWidth / 2;
+            }
 
 			if (!this.ranged) {
 				this.handleLeft.css({
@@ -298,24 +325,24 @@
 				});
 
 				this.connector.css({
-					width: pos
+					width: posConnector
 				});
 
 				this.input.attr('value', value);
 
 				if (this.options.showValue) {
-					this.value.html(Math.round(value * 10) / 10);
+					this.value.html(this.round(value, this.options.decimals));
 				}
 
 				if (typeof(this.options.onChange) == 'function') {
-					if (this.options.minChangeInterval == 0) {
+					if (this.options.minChangeInterval === 0) {
 						this.options.onChange(value, this.input[0]);
 					} else {
 						currentTime = this.getMillitime();
 						sinceLast = currentTime - this.lastChangeTime;
 
 						if (
-							this.options.minChangeInterval == null
+							this.options.minChangeInterval === null
 							|| sinceLast >= this.options.minChangeInterval
 						) {
 							this.options.onChange(value, this.input[0]);
@@ -328,8 +355,8 @@
 						? this.handleLeft
 						: this.handleRight,
 					currentValues = this.input.val().split(' '),
-					valueLeft = parseInt(currentValues[0]),
-					valueRight = parseInt(currentValues[1]);
+					valueLeft = parseInt(currentValues[0], 10),
+					valueRight = parseInt(currentValues[1], 10);
 
 				handle.css({
 					left: pos
@@ -353,8 +380,8 @@
 
 				if (this.options.showValue) {
 					this.value.html(
-						(Math.round(valueLeft * 10) / 10) + ' - ' +
-						(Math.round(valueRight * 10) / 10)
+						this.round(valueLeft, this.options.decimals) + ' - ' +
+						this.round(valueRight, this.options.decimals)
 					);
 				}
 
@@ -367,7 +394,7 @@
 				}
 
 				if (typeof(this.options.onChange) == 'function') {
-					if (this.options.minChangeInterval == 0) {
+					if (this.options.minChangeInterval === 0) {
 						this.options.onChange(
 							valueLeft,
 							valueRight,
@@ -378,7 +405,7 @@
 						sinceLast = currentTime - this.lastChangeTime;
 
 						if (
-							this.options.minChangeInterval == null
+							this.options.minChangeInterval === null
 							|| sinceLast >= this.options.minChangeInterval
 						) {
 							this.options.onChange(
@@ -395,8 +422,8 @@
 			this.input.trigger('change');
 		};
 
-		this.onDragEnd = function(e) {
-			if (this.dragging == 0) {
+		this.onDragEnd = function() {
+			if (this.dragging === 0) {
 				return;
 			}
 
@@ -415,7 +442,7 @@
 
 		this.onKeyDown = function(e) {
 			if (
-				this.activeHandle == 0
+				this.activeHandle === 0
 				|| (e.keyCode != 37 && e.keyCode != 39)
 			) {
 				return;
@@ -427,8 +454,8 @@
 				changeValue;
 
 			if (this.ranged) {
-				leftValue = parseInt(rawValue.split(' ')[0]);
-				rightValue = parseInt(rawValue.split(' ')[1]);
+				leftValue = parseInt(rawValue.split(' ')[0], 10);
+				rightValue = parseInt(rawValue.split(' ')[1], 10);
 
 				if (this.activeHandle == 1) {
 					changeValue = leftValue;
@@ -436,14 +463,13 @@
 					changeValue = rightValue;
 				}
 			} else {
-				leftValue = parseInt(rawValue);
+				leftValue = parseInt(rawValue, 10);
 				changeValue = leftValue;
 			}
 
-			var	minValue = parseInt(this.input.data('min')) || 0,
-				maxValue = parseInt(this.input.data('max')) || 100,
-				step = parseInt(this.input.data('step')) || 1,
-				newValue;
+			var	minValue = parseInt(this.input.data('min'), 10) || 0,
+				maxValue = parseInt(this.input.data('max'), 10) || 100,
+				step = parseInt(this.input.data('step'), 10) || 1;
 
 			if (e.shiftKey) {
 				step *= 10;
@@ -475,12 +501,12 @@
 		};
 
 		this.jumpTo = function(clientX) {
-			if (this.dragging != 0) {
+			if (this.dragging !== 0) {
 				return;
 			}
 
 			var wrapLeft = this.wrap.offset().left,
-				wrapWidth = parseInt(this.wrap.width()),
+				wrapWidth = parseInt(this.wrap.width(), 10),
 				pos = Math.min(Math.max(clientX - wrapLeft, 0), wrapWidth),
 				event = {
 					clientX: clientX
@@ -502,7 +528,7 @@
 			if (typeof(value) == 'string' && value.indexOf(' ') != -1) {
 				var startValues = value.split(' ');
 
-				this.startValueLeft = parseInt(startValues[0]);
+				this.startValueLeft = parseInt(startValues[0], 10);
 				this.startValueRight = startValues[1];
 
 				this.startValue = this.startValueLeft;
@@ -513,7 +539,7 @@
 				maxValue = this.input.data('max') || 100,
 				step = this.input.data('step') || 1,
 				range = maxValue - minValue,
-				wrapWidth = parseInt(this.wrap.width());
+				wrapWidth = parseInt(this.wrap.width(), 10);
 
 			if (this.ranged) {
 				if (this.startValueLeft < minValue) {
@@ -556,8 +582,8 @@
 
 				if (this.options.showValue) {
 					this.value.html(
-						(Math.round(valueLeft * 10) / 10) + ' - ' +
-						(Math.round(valueRight * 10) / 10)
+						this.round(valueLeft, this.options.decimals) + ' - ' +
+						this.round(valueRight, this.options.decimals)
 					);
 				}
 
@@ -590,7 +616,7 @@
 				this.input.attr('value', value);
 
 				if (this.options.showValue) {
-					this.value.html(Math.round(singleValue * 10) / 10);
+					this.value.html(this.round(singleValue, this.options.decimals));
 				}
 
 				if (typeof(this.options.onChange) == 'function') {
@@ -623,7 +649,15 @@
 		this.getMillitime = function() {
 			return (new Date()).getTime();
 		};
-	};
+
+		this.round = function(number, decimals) {
+			if (typeof(number) !== 'number') {
+				return number;
+			}
+
+			return number.toFixed(decimals);
+		};
+	}
 
 	Slider.prototype = {
 		init: function() {
@@ -663,9 +697,9 @@
 
 		val: function(value, right) {
 			if (typeof(right) != 'undefined') {
-				value = parseInt(value) + ' ' + parseInt(right);
-			} else if (parseInt(value) == value) {
-				value = parseInt(value);
+				value = parseInt(value, 10) + ' ' + parseInt(right, 10);
+			} else if (parseInt(value, 10) == value) {
+				value = parseInt(value, 10);
 			}
 
 			this.setValue(value);
@@ -691,14 +725,14 @@
 			this.each(function() {
 				var slider = $(this).data('slider');
 
-				if (slider == null) {
+				if (typeof(slider) !== 'object') {
 					slider = new Slider(this, options);
 
 					slider.init();
 
 					$(this).data('slider', slider);
 				} else {
-					if (args.length == 0) {
+					if (args.length === 0) {
 						return;
 					}
 
@@ -710,5 +744,7 @@
 				}
 			});
 		}
+
+		return this;
 	};
 })(jQuery);
